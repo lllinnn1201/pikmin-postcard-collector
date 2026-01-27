@@ -1,121 +1,153 @@
 -- =====================================================
--- 皮克敏明信片 - 資料庫結構腳本
--- 請在 Supabase Dashboard > SQL Editor 中執行此腳本
+-- 皮克敏明信片收藏館 - 最終整合腳本 (資料庫 + 儲存空間)
 -- =====================================================
 
--- 建立 profiles 表（使用者擴展資訊）
--- 與 Supabase Auth 的 users 表關聯
-CREATE TABLE IF NOT EXISTS profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,  -- 關聯 auth.users
-  username VARCHAR(50),                                              -- 使用者名稱
-  avatar TEXT,                                                       -- 頭像網址
-  level INTEGER DEFAULT 1,                                           -- 等級
-  title VARCHAR(50) DEFAULT '新手探險家',                            -- 稱號
-  total_postcards INTEGER DEFAULT 0,                                 -- 收集明信片總數
-  total_distance_km DECIMAL(10,2) DEFAULT 0,                        -- 步行總距離（公里）
-  created_at TIMESTAMPTZ DEFAULT NOW(),                              -- 建立時間
-  updated_at TIMESTAMPTZ DEFAULT NOW()                               -- 更新時間
+-- 1. 建立/更新基礎資料表 (Profiles)
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  username TEXT, 
+  avatar TEXT, 
+  level INTEGER DEFAULT 1,
+  title TEXT DEFAULT '新手探險家', 
+  total_postcards INTEGER DEFAULT 0,
+  total_distance_km DECIMAL(10,2) DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(), 
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 建立 postcards 表（明信片主資料）
--- 存放所有可用的明信片資料
-CREATE TABLE IF NOT EXISTS postcards (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),  -- 明信片 ID
-  title VARCHAR(100) NOT NULL,                    -- 標題
-  location VARCHAR(100) NOT NULL,                 -- 地點
-  country VARCHAR(50) NOT NULL,                   -- 國家
-  image_url TEXT NOT NULL,                        -- 圖片網址
-  description TEXT,                               -- 描述
-  color VARCHAR(20),                              -- 顏色標籤
-  is_special BOOLEAN DEFAULT FALSE,               -- 是否為特殊明信片
-  category VARCHAR(20) DEFAULT '探險',           -- 分類（蘑菇、探險、花瓣）
-  created_at TIMESTAMPTZ DEFAULT NOW()            -- 建立時間
+-- 2. 建立/更新明信片資料表 (Postcards)
+CREATE TABLE IF NOT EXISTS public.postcards (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(100) NOT NULL, 
+  location VARCHAR(100) NOT NULL,
+  country VARCHAR(50) NOT NULL, 
+  image_url TEXT NOT NULL,
+  description TEXT, 
+  color VARCHAR(20), 
+  is_special BOOLEAN DEFAULT FALSE,
+  category VARCHAR(20) DEFAULT '探險',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 建立 user_postcards 表（使用者收集的明信片）
--- 關聯使用者與明信片的中間表
-CREATE TABLE IF NOT EXISTS user_postcards (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),                           -- 紀錄 ID
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,         -- 使用者 ID
-  postcard_id UUID NOT NULL REFERENCES postcards(id) ON DELETE CASCADE,    -- 明信片 ID
-  collected_date DATE DEFAULT CURRENT_DATE,                                 -- 收集日期
-  is_favorite BOOLEAN DEFAULT FALSE,                                        -- 是否為最愛
-  sent_to VARCHAR(100),                                                     -- 寄送對象名稱
-  created_at TIMESTAMPTZ DEFAULT NOW(),                                     -- 建立時間
-  UNIQUE(user_id, postcard_id)                                              -- 確保不重複收集
+-- 3. 建立/更新使用者收集表 (User Postcards)
+CREATE TABLE IF NOT EXISTS public.user_postcards (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  postcard_id UUID NOT NULL REFERENCES postcards(id) ON DELETE CASCADE,
+  collected_date DATE DEFAULT CURRENT_DATE, 
+  is_favorite BOOLEAN DEFAULT FALSE,
+  sent_to VARCHAR(100),
+  created_at TIMESTAMPTZ DEFAULT NOW(), 
+  UNIQUE(user_id, postcard_id)
 );
 
--- 建立 friends 表（好友關係）
--- 儲存使用者之間的好友關係
-CREATE TABLE IF NOT EXISTS friends (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),                            -- 紀錄 ID
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,          -- 使用者 ID
-  friend_id UUID REFERENCES profiles(id) ON DELETE CASCADE,                  -- 好友 ID (可為空，代表手動新增的皮友)
-  friend_name VARCHAR(100),                                                  -- 手動新增的好友名稱
-  friend_avatar TEXT,                                                        -- 手動新增的好友頭像
-  is_favorite BOOLEAN DEFAULT FALSE,                                         -- 是否為最愛好友
-  created_at TIMESTAMPTZ DEFAULT NOW(),                                      -- 建立時間
-  UNIQUE(user_id, friend_id)                                                 -- 確保系統好友不重複
+-- 4. 建立/更新好友表 (Friends)
+CREATE TABLE IF NOT EXISTS public.friends (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  friend_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  friend_name VARCHAR(100),
+  friend_avatar TEXT,
+  is_favorite BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, friend_id)
 );
 
--- 建立 exchange_records 表（明信片交換紀錄）
--- 記錄使用者之間的明信片寄送
-CREATE TABLE IF NOT EXISTS exchange_records (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),                            -- 紀錄 ID
-  sender_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,        -- 寄件者 ID
-  receiver_id UUID REFERENCES profiles(id) ON DELETE CASCADE,              -- 收件者 ID (可為空)
-  receiver_name VARCHAR(100),                                                -- 收件者名稱 (手動標註用)
-  postcard_id UUID NOT NULL REFERENCES postcards(id) ON DELETE CASCADE,     -- 明信片 ID
-  sent_date TIMESTAMPTZ DEFAULT NOW(),                                       -- 寄送時間
-  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'delivered', 'claimed')),  -- 狀態
-  created_at TIMESTAMPTZ DEFAULT NOW()                                       -- 建立時間
+-- 5. 建立/更新交換紀錄表 (Exchange Records)
+CREATE TABLE IF NOT EXISTS public.exchange_records (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  receiver_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  receiver_name VARCHAR(100),
+  postcard_id UUID NOT NULL REFERENCES postcards(id) ON DELETE CASCADE,
+  sent_date TIMESTAMPTZ DEFAULT NOW(),
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'delivered', 'claimed')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- =====================================================
--- 建立索引加速查詢
--- =====================================================
+-- 6. 強制補齊欄位與修正約束 (防止舊版本缺漏)
+ALTER TABLE public.postcards ADD COLUMN IF NOT EXISTS category VARCHAR(20) DEFAULT '探險';
+ALTER TABLE public.user_postcards ADD COLUMN IF NOT EXISTS sent_to VARCHAR(100);
+ALTER TABLE public.friends ALTER COLUMN friend_id DROP NOT NULL;
+ALTER TABLE public.friends ADD COLUMN IF NOT EXISTS friend_name VARCHAR(100);
+ALTER TABLE public.friends ADD COLUMN IF NOT EXISTS friend_avatar TEXT;
+ALTER TABLE public.exchange_records ALTER COLUMN receiver_id DROP NOT NULL;
+ALTER TABLE public.exchange_records ADD COLUMN IF NOT EXISTS receiver_name VARCHAR(100);
 
-CREATE INDEX IF NOT EXISTS idx_user_postcards_user_id ON user_postcards(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_postcards_postcard_id ON user_postcards(postcard_id);
-CREATE INDEX IF NOT EXISTS idx_friends_user_id ON friends(user_id);
-CREATE INDEX IF NOT EXISTS idx_exchange_records_sender_id ON exchange_records(sender_id);
-CREATE INDEX IF NOT EXISTS idx_exchange_records_receiver_id ON exchange_records(receiver_id);
+-- 7. 建立儲存桶 (Storage Buckets)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('friend-avatars', 'friend-avatars', true)
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('postcards', 'postcards', true)
+ON CONFLICT (id) DO NOTHING;
 
--- =====================================================
--- 建立觸發器：自動更新 profiles.updated_at
--- =====================================================
+-- 8. 啟用 RLS
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.postcards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_postcards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.friends ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exchange_records ENABLE ROW LEVEL SECURITY;
 
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- 9. 設定資料表安全政策 (RLS Policies)
+-- Profiles: 所有人可見，本人可改
+DROP POLICY IF EXISTS "所有人可讀取 profiles" ON public.profiles;
+CREATE POLICY "所有人可讀取 profiles" ON public.profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "使用者可更新自己的 profile" ON public.profiles;
+CREATE POLICY "使用者可更新自己的 profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+-- Postcards: 所有人可讀，所有人可新增 (自定義明信片)
+DROP POLICY IF EXISTS "所有人可讀取 postcards" ON public.postcards;
+CREATE POLICY "所有人可讀取 postcards" ON public.postcards FOR SELECT USING (true);
+DROP POLICY IF EXISTS "登入使用者可新增 postcards" ON public.postcards;
+CREATE POLICY "登入使用者可新增 postcards" ON public.postcards FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- User Postcards & Friends: 僅限本人操作
+DROP POLICY IF EXISTS "使用者可操作自己的 user_postcards" ON public.user_postcards;
+CREATE POLICY "使用者可操作自己的 user_postcards" ON public.user_postcards FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "使用者可操作自己的 friends" ON public.friends;
+CREATE POLICY "使用者可操作自己的 friends" ON public.friends FOR ALL USING (auth.uid() = user_id);
+
+-- Exchange Records: 寄件者與收件者可見
+DROP POLICY IF EXISTS "使用者可操作自己的 exchange_records" ON public.exchange_records;
+CREATE POLICY "使用者可操作自己的 exchange_records" ON public.exchange_records FOR ALL USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+-- 10. 設定儲存空間安全政策 (Storage Policies)
+-- 好友頭像 (friend-avatars)
+DROP POLICY IF EXISTS "所有人可讀取好友頭像" ON storage.objects;
+CREATE POLICY "所有人可讀取好友頭像" ON storage.objects FOR SELECT USING (bucket_id = 'friend-avatars');
+DROP POLICY IF EXISTS "使用者可管理自己的好友頭像" ON storage.objects;
+CREATE POLICY "使用者可管理自己的好友頭像" ON storage.objects FOR ALL USING (bucket_id = 'friend-avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+-- 明信片圖片 (postcards)
+DROP POLICY IF EXISTS "所有人可讀取明信片圖片" ON storage.objects;
+CREATE POLICY "所有人可讀取明信片圖片" ON storage.objects FOR SELECT USING (bucket_id = 'postcards');
+DROP POLICY IF EXISTS "使用者可管理自己的明信片圖片" ON storage.objects;
+CREATE POLICY "使用者可管理自己的明信片圖片" ON storage.objects FOR ALL USING (bucket_id = 'postcards' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+-- 11. 自動 Profile 觸發器
+CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_profiles_updated_at
-  BEFORE UPDATE ON profiles
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
-
--- =====================================================
--- 建立觸發器：新使用者註冊時自動建立 profile
--- =====================================================
-
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO profiles (id, username, avatar)
+  -- 建立新使用者時，自動從 meta_data 或 email 中提取資訊
+  -- 如果 email 結尾是 @pikmin.internal，則去除該後綴作為初始用戶名
+  INSERT INTO public.profiles (id, username, avatar)
   VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'name', NEW.email),
-    NEW.raw_user_meta_data->>'avatar'
+    NEW.id, 
+    COALESCE(
+      NEW.raw_user_meta_data->>'name', 
+      CASE 
+        WHEN NEW.email LIKE '%@pikmin.internal' THEN SPLIT_PART(NEW.email, '@', 1)
+        ELSE NEW.email
+      END,
+      '新探險家'
+    ), 
+    COALESCE(NEW.raw_user_meta_data->>'avatar', 'https://via.placeholder.com/150')
   );
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION handle_new_user();
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();

@@ -10,8 +10,8 @@ interface AuthContextType {
     user: User | null;           // 當前使用者
     session: Session | null;     // 當前 Session
     loading: boolean;            // 載入中狀態
-    signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;  // 登入
-    signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>;  // 註冊
+    signIn: (username: string, password: string) => Promise<{ error: AuthError | null }>;  // 登入
+    signUp: (username: string, password: string) => Promise<{ error: AuthError | null }>;  // 註冊
     signOut: () => Promise<void>;  // 登出
 }
 
@@ -49,14 +49,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    // 電子郵件登入
-    const signIn = async (email: string, password: string) => {
+    // 帳號名稱登入（內部轉換為偽電子郵件）
+    const signIn = async (username: string, password: string) => {
+        // 將帳號名稱轉換為內部使用的電子郵件格式
+        const email = `${username}@pikmin.internal`;
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         return { error };
     };
 
-    // 電子郵件註冊
-    const signUp = async (email: string, password: string) => {
+    // 帳號名稱註冊（內部轉換為偽電子郵件）
+    const signUp = async (username: string, password: string) => {
+        // 將帳號名稱轉換為內部使用的電子郵件格式
+        const email = `${username}@pikmin.internal`;
         const { error } = await supabase.auth.signUp({ email, password });
         return { error };
     };

@@ -15,7 +15,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const { signIn, signUp } = useAuth();
 
   // 表單狀態
-  const [email, setEmail] = useState('');           // 電子郵件
+  const [username, setUsername] = useState('');      // 帳號名稱
   const [password, setPassword] = useState('');     // 密碼
   const [isLoading, setIsLoading] = useState(false); // 載入中狀態
   const [error, setError] = useState<string | null>(null); // 錯誤訊息
@@ -30,24 +30,25 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
     try {
       // 根據模式執行登入或註冊
       const { error: authError } = isSignUp
-        ? await signUp(email, password)
-        : await signIn(email, password);
+        ? await signUp(username, password)
+        : await signIn(username, password);
 
       if (authError) {
         // 轉換錯誤訊息為中文
         if (authError.message.includes('Invalid login credentials')) {
-          setError('帳號或密碼錯誤');
+          setError('帳號名稱或密碼錯誤');
         } else if (authError.message.includes('Email not confirmed')) {
-          setError('請先確認您的電子郵件');
-        } else if (authError.message.includes('User already registered')) {
-          setError('此電子郵件已註冊');
+          setError('帳號尚未啟用');
+        } else if (authError.message.includes('User already registered') || authError.message.includes('Signup disabled')) {
+          setError('此帳號名稱已被使用');
         } else {
           setError(authError.message);
         }
       } else {
         // 登入/註冊成功
         if (isSignUp) {
-          setError('註冊成功！請檢查您的電子郵件以確認帳號。');
+          setError('註冊成功！現在您可以使用此帳號登入了。');
+          setIsSignUp(false); // 註冊成功後切換至登入模式
         } else {
           onLogin();  // 觸發登入成功回調
         }
@@ -94,8 +95,8 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         {/* 錯誤訊息 */}
         {error && (
           <div className={`mb-4 p-3 rounded-xl text-sm font-medium ${error.includes('成功')
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+            ? 'bg-green-50 text-green-700 border border-green-200'
+            : 'bg-red-50 text-red-700 border border-red-200'
             }`}>
             {error}
           </div>
@@ -103,20 +104,20 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
 
         {/* 登入表單 */}
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          {/* 電子郵件欄位 */}
+          {/* 帳號名稱欄位 */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-main-light dark:text-slate-200 pl-1">電子郵件</label>
+            <label className="text-sm font-medium text-text-main-light dark:text-slate-200 pl-1">帳號名稱</label>
             <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 focus-within:ring-2 focus-within:ring-primary/20 px-4">
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="flex-1 py-3 bg-transparent border-none focus:ring-0 text-text-main-light dark:text-white placeholder:text-slate-400"
-                placeholder="輸入您的電子郵件"
+                placeholder="輸入您的帳號名稱"
                 required
                 disabled={isLoading}
               />
-              <span className="material-symbols-outlined text-primary text-[20px]">email</span>
+              <span className="material-symbols-outlined text-primary text-[20px]">person</span>
             </div>
           </div>
 
