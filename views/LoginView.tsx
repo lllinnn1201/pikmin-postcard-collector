@@ -42,7 +42,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
         } else if (authError.message.includes('User already registered') || authError.message.includes('Signup disabled')) {
           setError('此帳號名稱已被使用');
         } else if (authError.message.includes('rate limit') || authError.message.includes('Too many requests')) {
-          setError('嘗試次數過多，請稍後再試或更換帳號名稱');
+          setError(isSignUp ? '註冊嘗試次數過多，請稍後再試' : '登入嘗試次數過多，請稍後再試');
         } else {
           setError(authError.message);
         }
