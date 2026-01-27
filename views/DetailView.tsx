@@ -12,8 +12,17 @@ interface DetailViewProps {
 
 const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => {
   const { user } = useAuth();
-  const { updatePostcardSentTo } = usePostcards();
+  const { updatePostcardSentTo, updatePostcard } = usePostcards();
   const { friends } = useFriends();
+
+  // 使用本地狀態來管理顯示資料，確保編輯後能即時更新 UI
+  const [displayPostcard, setDisplayPostcard] = useState<Postcard>(postcard);
+
+  // 當 props // postcard 改變時同步更新本地狀態
+  React.useEffect(() => {
+    setDisplayPostcard(postcard);
+  }, [postcard]);
+
   const [recipientName, setRecipientName] = useState('');          // 收件人姓名輸入
   const [isSaving, setIsSaving] = useState(false);                  // 儲存中狀態
   const [showSuggestions, setShowSuggestions] = useState(false);    // 顯示好友建議選單
@@ -105,7 +114,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
       alert('儲存失敗：' + error);
     } else {
       // 本地同步更新物件狀態，讓 UI 即時切換為已寄送
-      postcard.sentTo = recipientName.trim();
+      setDisplayPostcard(prev => ({ ...prev, sentTo: recipientName.trim() }));
     }
     setIsSaving(false);
     setShowSuggestions(false); // 儲存後隱藏建議
@@ -114,6 +123,51 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
   // 取得顯示名稱的首字母
   const getInitials = (name: string) => {
     return name.slice(0, 2).toUpperCase();
+  };
+
+
+  // 編輯模式狀態
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    title: '',
+    country: '',
+    location: '',
+  });
+
+  const handleStartEdit = () => {
+    setEditData({
+      title: displayPostcard.title,
+      country: displayPostcard.country,
+      location: displayPostcard.location,
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setIsSaving(true);
+    const { error } = await updatePostcard(postcard.id, {
+      title: editData.title,
+      country: editData.country,
+      location: editData.location
+    });
+
+    if (error) {
+      alert('更新失敗：' + error);
+    } else {
+      // 更新本地顯示資料
+      setDisplayPostcard(prev => ({
+        ...prev,
+        title: editData.title,
+        country: editData.country,
+        location: editData.location
+      }));
+      setIsEditing(false);
+    }
+    setIsSaving(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
   };
 
   return (
@@ -142,7 +196,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
             <div className="w-full aspect-[3/2] bg-gray-200 rounded-lg overflow-hidden relative">
               <div
                 className="w-full h-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${postcard.imageUrl})` }}
+                style={{ backgroundImage: `url(${displayPostcard.imageUrl})` }}
               />
             </div>
             <div className="mt-4 px-1 flex justify-between items-center opacity-60">
@@ -153,19 +207,87 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
         </div>
 
         <div className="w-full max-w-sm flex flex-col items-center text-center space-y-4">
-          <h1 className="text-2xl font-extrabold text-text-main-light dark:text-white tracking-tight">
-            {postcard.title} - {postcard.country} {postcard.location}
-          </h1>
+          {isEditing ? (
+            <div className="w-full bg-white/50 dark:bg-black/20 p-4 rounded-2xl border border-primary/20 space-y-3">
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] uppercase font-bold text-primary tracking-wider">標題</label>
+                <input
+                  type="text"
+                  value={editData.title}
+                  onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/80 dark:bg-black/40 outline-none text-lg font-bold text-center text-text-main-light dark:text-white"
+                  placeholder="輸入標題"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">國家</label>
+                  <input
+                    type="text"
+                    value={editData.country}
+                    onChange={(e) => setEditData(prev => ({ ...prev, country: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/80 dark:bg-black/40 outline-none text-sm font-bold text-center text-gray-600 dark:text-gray-300"
+                    placeholder="國家"
+                  />
+                </div>
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">地點</label>
+                  <input
+                    type="text"
+                    value={editData.location}
+                    onChange={(e) => setEditData(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 bg-white/80 dark:bg-black/40 outline-none text-sm font-bold text-center text-gray-600 dark:text-gray-300"
+                    placeholder="地點"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 justify-center pt-2">
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-4 py-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold text-sm transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                  className="px-4 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold text-sm transition-colors flex items-center gap-1"
+                >
+                  {isSaving ? <span className="material-symbols-outlined animate-spin text-sm">sync</span> : <span className="material-symbols-outlined text-sm">check</span>}
+                  儲存
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="relative group/edit">
+                <h1 className="text-2xl font-extrabold text-text-main-light dark:text-white tracking-tight leading-tight">
+                  {displayPostcard.title}
+                </h1>
+                <p className="text-sm font-bold text-gray-500 dark:text-gray-400 mt-1 mb-1">
+                  {displayPostcard.country} {displayPostcard.location}
+                </p>
+                <button
+                  onClick={handleStartEdit}
+                  className="absolute -right-8 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-300 hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover/edit:opacity-100"
+                  title="編輯資訊"
+                >
+                  <span className="material-symbols-outlined text-[18px]">edit</span>
+                </button>
+              </div>
+            </>
+          )}
+
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/20 text-green-900 dark:text-green-100 text-sm font-bold shadow-sm border border-primary/10">
             <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-            <span>收集日期：{postcard.date}</span>
+            <span>收集日期：{displayPostcard.date}</span>
           </div>
 
           <div className="w-full bg-white/60 dark:bg-black/20 backdrop-blur-sm rounded-xl p-5 border border-white/40 dark:border-white/5 shadow-sm mt-2">
             <div className="flex gap-3 items-start">
               <span className="material-symbols-outlined text-primary mt-1">format_quote</span>
               <p className="text-base text-gray-600 dark:text-gray-300 font-medium leading-relaxed text-left">
-                {postcard.description} 這是一份很棒的旅行紀念。
+                {displayPostcard.description} 這是一份很棒的旅行紀念。
               </p>
             </div>
           </div>
@@ -178,29 +300,29 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
 
             <div className="bg-[#fcfdf6] dark:bg-[#1a2e20] border border-green-800/10 dark:border-green-800/30 rounded-2xl p-4 shadow-sm relative overflow-visible">
               <div className="space-y-3 relative z-10">
-                {postcard.sentTo ? (
+                {displayPostcard.sentTo ? (
                   /* 已寄送顯示 */
                   <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/50 dark:bg-black/20 hover:bg-white transition-colors border border-transparent">
                     <div className="flex items-center gap-3">
                       {/* 已寄送者頭像：支援自訂頭像或縮寫 */}
                       {(() => {
-                        const matchedFriend = friends.find(f => f.name === postcard.sentTo);
+                        const matchedFriend = friends.find(f => f.name === displayPostcard.sentTo);
                         if (matchedFriend && isCustomAvatar(matchedFriend.avatar)) {
                           return (
                             <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
-                              <img src={matchedFriend.avatar} alt={postcard.sentTo} className="w-full h-full object-cover" />
+                              <img src={matchedFriend.avatar} alt={displayPostcard.sentTo} className="w-full h-full object-cover" />
                             </div>
                           );
                         }
-                        const avatarColor = matchedFriend ? getAvatarColor(postcard.sentTo, matchedFriend.id) : 'bg-slate-400';
+                        const avatarColor = matchedFriend ? getAvatarColor(displayPostcard.sentTo!, matchedFriend.id) : 'bg-slate-400';
                         return (
                           <div className={`w-10 h-10 rounded-full ${avatarColor} border-2 border-white flex items-center justify-center font-bold text-xs text-white`}>
-                            {getInitials(postcard.sentTo)}
+                            {getInitials(displayPostcard.sentTo!)}
                           </div>
                         );
                       })()}
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-text-main-light dark:text-white">{postcard.sentTo}</span>
+                        <span className="text-sm font-bold text-text-main-light dark:text-white">{displayPostcard.sentTo}</span>
                         <span className="text-[10px] text-gray-400">已成功寄送給此好友</span>
                       </div>
                     </div>
@@ -217,7 +339,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                           if (error) {
                             alert('刪除失敗：' + error);
                           } else {
-                            postcard.sentTo = undefined; // 本地同步更新
+                            setDisplayPostcard(prev => ({ ...prev, sentTo: undefined })); // 本地同步更新
                           }
                         }}
                         className="size-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 transition-colors active:scale-95"
@@ -311,13 +433,6 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div className="mt-3 pt-2 px-1 flex gap-2 items-start border-t border-green-800/5">
-                <span className="material-symbols-outlined text-green-600/60 text-[14px] mt-[2px]">info</span>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-snug">
-                  {postcard.sentTo ? '再次選擇這些好友將會重複寄送此張明信片。' : '寄送後紀錄將會顯示在此處。'}
-                </p>
               </div>
             </div>
           </div>

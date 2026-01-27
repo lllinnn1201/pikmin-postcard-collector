@@ -33,6 +33,17 @@ CREATE POLICY "所有人可讀取 postcards"
   ON postcards FOR SELECT
   USING (true);
 
+-- 使用者可更新自己的明信片 (透過 user_postcards 關聯驗證)
+CREATE POLICY "使用者可更新自己的 postcards"
+  ON postcards FOR UPDATE
+  USING (
+    id IN (
+      SELECT postcard_id 
+      FROM user_postcards 
+      WHERE user_id = auth.uid()
+    )
+  );
+
 -- =====================================================
 -- user_postcards 表政策
 -- =====================================================

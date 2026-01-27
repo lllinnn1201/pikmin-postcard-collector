@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState, Postcard } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { PostcardProvider } from './contexts/PostcardContext';
 import { useProfile } from './hooks/useProfile';
 import LoginView from './views/LoginView';
 import CollectionView from './views/CollectionView';
@@ -125,7 +126,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <PostcardProvider>
+        <AppContent />
+      </PostcardProvider>
     </AuthProvider>
   );
 };
