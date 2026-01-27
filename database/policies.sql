@@ -94,3 +94,31 @@ CREATE POLICY "使用者可新增 exchange_records"
 CREATE POLICY "收件者可更新 exchange_records 狀態"
   ON exchange_records FOR UPDATE
   USING (auth.uid() = receiver_id);
+
+-- 使用者可刪除自己的 exchange_records (作為寄件者)
+CREATE POLICY "寄件者可刪除 exchange_records"
+  ON exchange_records FOR DELETE
+  USING (auth.uid() = sender_id);
+
+-- =====================================================
+-- 補充遺漏的 DELETE 政策
+-- =====================================================
+
+-- Postcards: 允許使用者刪除自己收集的明信片
+-- 原理：檢查 user_postcards 表中是否有對應的 user_id
+DROP POLICY IF EXISTS "使用者可刪除自己的 postcards" ON postcards;
+CREATE POLICY "使用者可刪除自己的 postcards"
+  ON postcards FOR DELETE
+  USING (
+    id IN (
+      SELECT postcard_id 
+      FROM user_postcards 
+      WHERE user_id = auth.uid()
+    )
+  );
+
+-- User Postcards: 使用者可刪除自己的收集紀錄
+DROP POLICY IF EXISTS "使用者可刪除自己的 user_postcards" ON user_postcards;
+CREATE POLICY "使用者可刪除自己的 user_postcards"
+  ON user_postcards FOR DELETE
+  USING (auth.uid() = user_id);

@@ -258,16 +258,10 @@ export const usePostcards = () => {
         if (!user) return { error: '請先登入' };
 
         try {
-            // 1. 從 user_postcards 中刪除關聯紀錄
-            const { error: deleteUserPostcardError } = await supabase
-                .from('user_postcards')
-                .delete()
-                .eq('user_id', user.id)
-                .eq('postcard_id', postcardId);
-
-            if (deleteUserPostcardError) throw deleteUserPostcardError;
-
-            // 2. 從 postcards 主表刪除明信片記錄
+            // 1. 從 postcards 主表刪除明信片記錄
+            // 注意：由於資料庫設有 ON DELETE CASCADE，這會自動刪除 user_postcards 中的關聯
+            // 我們必須先刪除主表（或只刪除主表），因為 RLS 政策依賴 user_postcards 來驗證擁有權
+            // 如果先刪除了 user_postcards，就會導致無法驗證擁有權而無法刪除 postcards
             const { error: deletePostcardError } = await supabase
                 .from('postcards')
                 .delete()
