@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { ViewState, Postcard } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useProfile } from './hooks/useProfile';
 import LoginView from './views/LoginView';
 import CollectionView from './views/CollectionView';
 import DetailView from './views/DetailView';
@@ -18,6 +19,9 @@ import BottomNav from './components/BottomNav';
 const AppContent: React.FC = () => {
   // 取得認證狀態
   const { user, loading } = useAuth();
+
+  // 啟動個人檔案追蹤（包含「查無資料即登出」的保護機制）
+  useProfile();
 
   // 當前視圖狀態
   const [currentView, setCurrentView] = useState<ViewState>('login');

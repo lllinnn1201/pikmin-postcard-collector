@@ -28,7 +28,7 @@ const mapRowToProfile = (row: any): Profile => ({
 });
 
 export const useProfile = () => {
-    const { user } = useAuth();
+    const { user, signOut } = useAuth(); // 取得當前使用者與登出方法
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -45,13 +45,23 @@ export const useProfile = () => {
             setLoading(true);
             setError(null);
 
+            // 查詢 profiles 資料表
             const { data, error: fetchError } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
                 .single();
 
-            if (fetchError) throw fetchError;
+            if (fetchError) {
+                // PGRST116 代表查無此資料 (JSON object not found)
+                // 這通常發生在後端手動刪除了該列資料，但前端仍有 Session 的情況
+                if (fetchError.code === 'PGRST116') {
+                    console.warn('偵測到帳號存在但查無個人檔案資料，執行強制登出...');
+                    await signOut();
+                    return;
+                }
+                throw fetchError;
+            }
 
             setProfile(mapRowToProfile(data));
         } catch (err: any) {
@@ -60,7 +70,7 @@ export const useProfile = () => {
         } finally {
             setLoading(false);
         }
-    }, [user]);
+    }, [user, signOut]);
 
     // 更新個人檔案
     const updateProfile = async (updates: Partial<{
