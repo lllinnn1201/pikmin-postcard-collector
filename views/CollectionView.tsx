@@ -23,13 +23,9 @@ const CollectionView: React.FC<CollectionViewProps> = ({
 
   // 監聽 API 資料變化並同步到本地狀態
   React.useEffect(() => {
-    if (apiPostcards.length > 0) {
-      setLocalPostcards(apiPostcards);
-    } else if (!loading) {
-      // 若 API 未回傳資料且載入完成，則初始化為 Mock 資料
-      setLocalPostcards(MOCK_POSTCARDS);
-    }
-  }, [apiPostcards, loading]);
+    // 同步 API 抓取的資料
+    setLocalPostcards(apiPostcards);
+  }, [apiPostcards]);
 
   // 分類篩選狀態
   const [filter, setFilter] = useState('全部');

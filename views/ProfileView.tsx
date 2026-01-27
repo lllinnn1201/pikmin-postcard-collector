@@ -39,12 +39,12 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onLogout }) => {
 
   // 預設資料（當 profile 尚未載入時使用）
   const displayProfile = profile || {
-    username: "Cap'n Olimar",
-    avatarUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCboh9WESKwZgvfzf33uSYeROw1bvUS-5NehHRBIjg0Ah2aZfOIqWADP8H0iLbWopRRk6yPavu340tgduA1V2_Ub1tkEVkkJRtCogugdqg0X-0_kAyRdNkSAVs2j8xVYvsx07IKKwdbwIy38HRuuQCPR7Xru-JB-0dllK9Gr4ybZ7ozkzoj4Ukejq63zxgZqoXtcNtOcWfCTD-oFpd-oXKea1EOr5Gj8aIv1yolOVs1mcmxjNWtpjT6h-fuSlLJaME2GR16v-t0C4Rw',
-    level: 42,
-    title: '皮克敏大師',
-    totalPostcards: 128,
-    totalDistanceKm: 1450,
+    username: "新使用者",
+    avatarUrl: 'https://ui-avatars.com/api/?name=User&background=random',
+    level: 1,
+    title: '皮克敏收藏家',
+    totalPostcards: 0,
+    totalDistanceKm: 0,
   };
 
   return (
