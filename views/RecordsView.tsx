@@ -202,11 +202,11 @@ const RecordsView: React.FC = () => {
           {filteredRecords.map((group) => (
             <div key={group.friendId} className="flex flex-col gap-4">
               {/* 好友資訊區 - 固定在上方 */}
-              <div className="flex items-center gap-4 px-1">
+              <div className="flex items-center gap-3 px-1">
                 {/* 好友頭像 - 使用純色背景 + 縮寫文字（與 FriendsView 一致） */}
                 {isCustomAvatar(group.friendAvatar) ? (
                   // 自訂頭像：顯示上傳的圖片
-                  <div className="w-[52px] h-[52px] rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
+                  <div className="w-[42px] h-[42px] rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
                     <img
                       src={group.friendAvatar}
                       alt={group.friendName}
@@ -215,16 +215,16 @@ const RecordsView: React.FC = () => {
                   </div>
                 ) : (
                   // 預設頭像：顯示名稱縮寫 + 顏色背景
-                  <div className={`w-[52px] h-[52px] rounded-full ${getAvatarColor(group.friendName, group.friendId)} border-2 border-white flex items-center justify-center shadow-sm shrink-0`}>
-                    <span className="text-white font-black text-lg tracking-tighter">
+                  <div className={`w-[42px] h-[42px] rounded-full ${getAvatarColor(group.friendName, group.friendId)} border-2 border-white flex items-center justify-center shadow-sm shrink-0`}>
+                    <span className="text-white font-black text-base tracking-tighter">
                       {getInitials(group.friendName)}
                     </span>
                   </div>
                 )}
                 {/* 好友名稱與統計 */}
                 <div className="flex-1">
-                  <h3 className="text-xl font-black text-slate-800 tracking-tight leading-tight">{group.friendName}</h3>
-                  <p className="text-sm font-medium text-slate-400">
+                  <h3 className="text-lg font-black text-slate-800 tracking-tight leading-tight">{group.friendName}</h3>
+                  <p className="text-xs font-medium text-slate-400">
                     已收到 <span className="text-primary font-bold">{group.postcards.length}</span> 張明信片
                   </p>
                 </div>
@@ -236,7 +236,7 @@ const RecordsView: React.FC = () => {
                   {group.postcards.map((postcard) => (
                     <div
                       key={postcard.id}
-                      className="flex-none w-[280px] snap-start group bg-white rounded-[28px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500 cursor-pointer active:scale-[0.98]"
+                      className="flex-none w-[220px] snap-start group bg-white rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500 cursor-pointer active:scale-[0.98]"
                     >
                       {/* 明信片大圖 */}
                       <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -245,19 +245,19 @@ const RecordsView: React.FC = () => {
                           style={{ backgroundImage: `url(${postcard.imageUrl})` }}
                         />
                         {/* 已收到浮動標籤 */}
-                        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm">
-                          <span className="material-symbols-outlined text-[16px] text-primary font-bold">check_circle</span>
-                          <span className="text-[11px] font-black text-primary tracking-wider uppercase">已收到</span>
+                        <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1 bg-white/90 backdrop-blur-md rounded-full shadow-sm">
+                          <span className="material-symbols-outlined text-[14px] text-primary font-bold">check_circle</span>
+                          <span className="text-[10px] font-black text-primary tracking-wider uppercase">已收到</span>
                         </div>
                       </div>
 
                       {/* 卡片內容區 */}
-                      <div className="p-5">
+                      <div className="p-4">
                         <div className="flex flex-col gap-1">
-                          <h4 className="text-lg font-black text-slate-800 tracking-tight leading-snug group-hover:text-primary transition-colors duration-300 truncate">
+                          <h4 className="text-base font-black text-slate-800 tracking-tight leading-snug group-hover:text-primary transition-colors duration-300 truncate">
                             {postcard.title}
                           </h4>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1">
                             <span className="material-symbols-outlined text-[14px] text-slate-300">calendar_today</span>
                             <p className="text-xs font-bold text-slate-400 tracking-wide uppercase">{postcard.date}</p>
                           </div>
