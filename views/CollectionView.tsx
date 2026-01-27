@@ -30,8 +30,28 @@ const CollectionView: React.FC<CollectionViewProps> = ({
   // 分類篩選狀態
   const [filter, setFilter] = useState('全部');
 
+  // 搜尋字串狀態
+  const [searchTerm, setSearchTerm] = useState('');
+
   // 刪除確認對話框狀態（儲存要刪除的明信片資訊）
   const [postcardToDelete, setPostcardToDelete] = useState<{ id: string; title: string; imageUrl: string } | null>(null);
+
+  // 判斷字元類型：中文、英文、特殊符號
+  const getCharType = (char: string): number => {
+    if (/[\u4e00-\u9fff]/.test(char)) return 0; // 中文優先
+    if (/[a-zA-Z]/.test(char)) return 1; // 英文次之
+    return 2; // 特殊符號最後
+  };
+
+  // 名稱排序比較函式（中文筆畫、英文 A~Z、特殊符號）
+  const compareName = (a: string, b: string): number => {
+    const typeA = getCharType(a.charAt(0));
+    const typeB = getCharType(b.charAt(0));
+    // 先按類型排序
+    if (typeA !== typeB) return typeA - typeB;
+    // 同類型則使用 localeCompare（中文會按筆畫排序）
+    return a.localeCompare(b, 'zh-Hant-TW', { sensitivity: 'base' });
+  };
 
   // 處理收藏切換
   const handleToggleFavorite = (e: React.MouseEvent, id: string) => {
@@ -69,13 +89,26 @@ const CollectionView: React.FC<CollectionViewProps> = ({
   };
 
 
-  // 篩選明信片 (使用本地狀態進行篩選)
-  const filteredPostcards = localPostcards.filter(p => {
-    if (filter === '全部') return true;
-    if (filter === '我的最愛') return p.isFavorite;
-    // 優先匹配類別，若無類別則回退到 isSpecial 判斷為「花瓣」
-    return p.category === filter || (filter === '花瓣' && p.isSpecial);
-  });
+  // 篩選與排序明信片 (使用本地狀態進行篩選)
+  const filteredPostcards = localPostcards
+    .filter(p => {
+      // 分類篩選
+      let matchFilter = true;
+      if (filter === '我的最愛') {
+        matchFilter = p.isFavorite || false;
+      } else if (filter !== '全部') {
+        matchFilter = p.category === filter || (filter === '花瓣' && p.isSpecial);
+      }
+
+      // 搜尋關鍵字過濾 (標題、地點、國家)
+      const matchSearch = searchTerm.trim() === '' ||
+        p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.country.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return matchFilter && matchSearch;
+    })
+    .sort((a, b) => compareName(a.title, b.title)); // 按標題進行筆畫排序
 
   // 分類選項
   // 分類選項：全部、我的最愛、蘑菇、探險、花瓣
@@ -97,8 +130,10 @@ const CollectionView: React.FC<CollectionViewProps> = ({
           </div>
           <input
             className="w-full h-full bg-transparent border-none pl-12 pr-4 text-base font-bold placeholder-text-sec-light/50 focus:ring-0 focus:outline-none dark:text-white"
-            placeholder="搜尋地點..."
+            placeholder="搜尋標題、國家、地點..."
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -192,7 +227,7 @@ const CollectionView: React.FC<CollectionViewProps> = ({
                 <h3 className="font-black text-text-main-light text-sm leading-tight mb-1 truncate">{p.title}</h3>
                 <div className="flex items-center text-[11px] font-bold text-text-sec-light">
                   <span className="material-symbols-outlined text-[12px] mr-1">location_on</span>
-                  {p.location}
+                  {p.country} {p.location}
                 </div>
               </div>
             </div>

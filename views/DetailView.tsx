@@ -139,7 +139,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
       <div className="flex-1 flex flex-col items-center justify-start pt-6 pb-48 px-6 relative z-10">
         <div className="relative group w-full max-w-sm mb-8">
           <div className="relative bg-white p-3 pb-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl transform transition-transform hover:rotate-1 hover:scale-[1.02] border border-gray-100/50">
-            <div className="w-full aspect-[4/5] bg-gray-200 rounded-lg overflow-hidden relative">
+            <div className="w-full aspect-[3/2] bg-gray-200 rounded-lg overflow-hidden relative">
               <div
                 className="w-full h-full bg-cover bg-center"
                 style={{ backgroundImage: `url(${postcard.imageUrl})` }}
@@ -154,7 +154,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
 
         <div className="w-full max-w-sm flex flex-col items-center text-center space-y-4">
           <h1 className="text-2xl font-extrabold text-text-main-light dark:text-white tracking-tight">
-            {postcard.title} - {postcard.location}
+            {postcard.title} - {postcard.country} {postcard.location}
           </h1>
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/20 text-green-900 dark:text-green-100 text-sm font-bold shadow-sm border border-primary/10">
             <span className="material-symbols-outlined text-[18px]">calendar_today</span>

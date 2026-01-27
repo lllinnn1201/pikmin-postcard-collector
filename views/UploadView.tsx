@@ -156,24 +156,22 @@ const UploadView: React.FC = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">地點</label>
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">國家</label>
                                 <input
-                                    required
-                                    name="location"
-                                    value={formData.location}
+                                    name="country"
+                                    value={formData.country}
                                     onChange={handleChange}
-                                    placeholder="地點名稱"
+                                    placeholder="國家名稱（選填）"
                                     className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">國家</label>
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">地點</label>
                                 <input
-                                    required
-                                    name="country"
-                                    value={formData.country}
+                                    name="location"
+                                    value={formData.location}
                                     onChange={handleChange}
-                                    placeholder="國家名稱"
+                                    placeholder="地點名稱（選填）"
                                     className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>

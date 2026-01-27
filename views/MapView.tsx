@@ -14,8 +14,8 @@ const MapView: React.FC<MapViewProps> = ({ onBack, onSelectPostcard }) => {
   return (
     <div className="relative h-screen w-full overflow-hidden flex flex-col">
       {/* Map Background */}
-      <div 
-        className="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
+      <div
+        className="absolute inset-0 w-full h-full bg-cover bg-center z-0"
         style={{ backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuCE0TZ5AN0ImSy8dOqibnzO_Y9hliouXrYvcc4GBfNhbdIr8wcqdqpfCosAFppdyv1RobQ9dCayPT-bhjRFCw51oW5oYHXZuoQ9UNSfX_yLNH7HX5zcbXuG7ZB6VUl0oaiCwk86EkOxrDNu-XbVsbiYEBftYFqHujFO1uqDy5oJFGxLYK5uKrc_NP-yXpTXfirCrqDR_Wy03M3jMpxeNYDZVgclNThotK-sa0GIVN21I1O6DlAZmxw6Hwk-KaDJk3WgrhvdZ119V1bt')` }}
       >
         <div className="absolute inset-0 bg-black/5"></div>
@@ -28,15 +28,15 @@ const MapView: React.FC<MapViewProps> = ({ onBack, onSelectPostcard }) => {
           <div className="flex flex-col gap-3 max-w-lg mx-auto">
             <div className="relative flex items-center w-full h-12 rounded-full shadow-soft bg-white dark:bg-slate-800 border border-transparent focus-within:border-primary transition-all px-4">
               <span className="material-symbols-outlined text-primary mr-2">search</span>
-              <input 
-                className="w-full bg-transparent border-none focus:ring-0 text-slate-800 dark:text-white placeholder-slate-400 text-base" 
-                placeholder="搜尋地點..." 
+              <input
+                className="w-full bg-transparent border-none focus:ring-0 text-slate-800 dark:text-white placeholder-slate-400 text-base"
+                placeholder="搜尋地點..."
               />
               <span className="material-symbols-outlined text-slate-400">tune</span>
             </div>
             <div className="flex gap-2 overflow-x-auto hide-scrollbar">
               {['全部', '稀有', '已寄送', '已收到'].map((label, idx) => (
-                <button 
+                <button
                   key={label}
                   className={`px-4 h-9 text-sm font-semibold rounded-full shadow-sm whitespace-nowrap ${idx === 0 ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 border border-gray-100'}`}
                 >
@@ -79,7 +79,7 @@ const MapView: React.FC<MapViewProps> = ({ onBack, onSelectPostcard }) => {
         <div className="mt-auto p-4 mb-24">
           <div className="bg-white dark:bg-slate-900 rounded-[24px] p-4 shadow-xl border border-gray-100 flex flex-col gap-4 animate-in slide-in-from-bottom-4">
             <div className="flex items-start gap-4">
-              <div 
+              <div
                 onClick={() => onSelectPostcard(mainPostcard)}
                 className="relative w-24 h-24 shrink-0 rounded-2xl overflow-hidden shadow-inner cursor-pointer"
               >
