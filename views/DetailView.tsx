@@ -269,7 +269,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                 </p>
                 <button
                   onClick={handleStartEdit}
-                  className="absolute -right-8 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-300 hover:text-primary hover:bg-primary/10 transition-all opacity-0 group-hover/edit:opacity-100"
+                  className="absolute -right-8 top-1/2 -translate-y-1/2 p-1.5 rounded-full text-gray-300 hover:text-primary hover:bg-primary/10 transition-all"
                   title="編輯資訊"
                 >
                   <span className="material-symbols-outlined text-[18px]">edit</span>
