@@ -49,19 +49,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    // 帳號名稱登入（內部轉換為偽電子郵件）
+    // 輔助函式：將使用者名稱轉為合法的 Email 格式
+    // 使用 Hex 編碼避免特殊字元問題
+    const encodeUsernameToEmail = (username: string) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(username);
+        const hex = Array.from(data)
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+        return `${hex}@pikmin.internal`;
+    };
+
+    // 帳號名稱登入（內部轉換為 Hex 編碼 Email）
     const signIn = async (username: string, password: string) => {
-        // 將帳號名稱轉換為內部使用的電子郵件格式
-        const email = `${username}@pikmin.internal`;
+        const email = encodeUsernameToEmail(username);
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         return { error };
     };
 
-    // 帳號名稱註冊（內部轉換為偽電子郵件）
+    // 帳號名稱註冊（內部轉換為 Hex 編碼 Email）
     const signUp = async (username: string, password: string) => {
-        // 將帳號名稱轉換為內部使用的電子郵件格式
-        const email = `${username}@pikmin.internal`;
-        const { error } = await supabase.auth.signUp({ email, password });
+        const email = encodeUsernameToEmail(username);
+        // 在 metadata 中帶入原始使用者名稱，讓資料庫 Trigger 正確設定 Profile
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    name: username
+                }
+            }
+        });
         return { error };
     };
 
