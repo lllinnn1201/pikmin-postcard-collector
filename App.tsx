@@ -55,9 +55,14 @@ const AppContent: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background-light">
         <div className="flex flex-col items-center gap-4">
-          <span className="material-symbols-outlined text-6xl text-primary animate-pulse">
-            local_florist
-          </span>
+          <svg
+            className="w-16 h-16 text-primary animate-pulse"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M12 2C9.79 2 8 3.79 8 6s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm4 8c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4z M4 10c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4zm8 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" />
+          </svg>
           <p className="text-text-sec-light font-medium">載入中...</p>
         </div>
       </div>
