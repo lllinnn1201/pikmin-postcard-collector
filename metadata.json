@@ -1,0 +1,7 @@
+{
+  "name": "Pikmin Postcard Collector",
+  "description": "A beautiful and interactive application to manage, collect, and share Pikmin Bloom postcards with friends.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

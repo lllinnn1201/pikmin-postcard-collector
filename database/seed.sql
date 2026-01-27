@@ -1,0 +1,14 @@
+-- =====================================================
+-- 皮克敏明信片收藏館 - 初始資料腳本
+-- 請在執行 schema.sql 後執行此腳本
+-- =====================================================
+
+-- 插入初始明信片資料（從前端 MOCK_POSTCARDS 轉換）
+INSERT INTO postcards (id, title, location, country, image_url, description, color, is_special) VALUES
+  ('00000000-0000-0000-0000-000000000001', '中央公園噴泉', '紐約', '美國', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeBBPHD02ooQ7FLejVhZA1BIkBU3nQipWePycfcREz6LFiDssqPAzFVNXi_Qbz8SWnmcNuMg7d5G92a9GQoow5g8PS1RpVMT6PZ_0zFtvLIefcY5VHO_i6QjtmhaFQYvGULycHrmqs4knsjmuZ69Wl7mxGmddBZDwjdUvqrKTa_oI8ktJI91G0XieDwbTQMrlbNmZV3uEYjb7BkXdnASyRIrZp2DmkWtaJSuY7Q5FPgV5otpu8AgAPw5LZjN8d9mJbmmmoxMhLydT8', '紅色和藍色皮克敏在花園附近發現了這個地方。他們似乎很喜歡噴泉的景色！', '#ef4444', FALSE),
+  ('00000000-0000-0000-0000-000000000002', '街角烘焙坊', '巴黎', '法國', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDIELrikjMHRyv2NZvaLnAH6jnfYqT4g1q0dfqCyv6P1T9MobVEebBHfgZBLHOqWowLxOh-10MIw_p5GE7TF9cjb0DDrOd2kDTEwHe6KHZlN_35mIi8RRA_yIS4eKu8FBKQvlE96WmziqljFKWOOmd-yGi4L99JY-_I-MPsh7jq7zxEde4kDB-PDFBxWROfgK0OO6sSxecWvCCswnIhfmdwhqMyp6Wg1aH3dd45skWjqJ0nikE4ZCUdYa1ek1DP1MTvbgRniC0Rn1Ld', '這裡充滿了可頌的香氣。', '#3b82f6', FALSE),
+  ('00000000-0000-0000-0000-000000000003', '艾菲爾鐵塔', '巴黎', '法國', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBvoTvLFFTCsKDrX8b1KwTLZfXiEITquNJCg6S6aaPviQvmbVIpXaGyGhtpK5c9jt3WjJ1DP3pT0Fa3fOzg8uA-OjTtKbr3khwPXcaCwDQynBD9BkS3FuDzDu2ig52uyabLE7zQcg9ocZT23R0NT92rjpGcKR509p8GVUhWWJT56qVHqBglITCHN1V5sOg1zxcx43UwQppjNteiW6bhhy7TXG_B-cEoQlDfcSnt2IXQxwhzJYLgXJHPmxhsE3HiZtZv5UMAaDmF-jMs', '紅色和藍色皮克敏在花園附近發現了這個地方。他們似乎很喜歡巴黎鐵塔的景色！這是一份很棒的旅行紀念。', '#ef4444', TRUE),
+  ('00000000-0000-0000-0000-000000000004', '東京鐵塔', '東京', '日本', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCunFt-hECuPgaJ_Dx-5UiD1dqUsrvKcvyxPQT7mbQ84FV_qkvVkA4s7f9iJE__iZBM3MV8mJmLRB3cgIo0npIDqFzKnD49nVGyD_g1KVQPhMtAakHdSzPL4Vg6Ij0jPN4eUmkOH5CvHhWhaW___nRfeqsqBw_8Mz0TFINjFeM2mF-9VXoDspm0HHHyNE0SsAOIcp0bChcffGR4GIlg0Ck0WOJ48IeQYHQBZr5x_zx8cWvFakSmLG_DBIY5GI-xwf6W8kZRJQF1sVzD', '夕陽下的紅色高塔。', '#facc15', FALSE),
+  ('00000000-0000-0000-0000-000000000005', '嵐山竹林', '京都', '日本', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAt8s4FDZlhxZmB-Pdea1nOkel8QMZDfQe__lX-HlPjyGJNHubq8UVSiTcOQEgvC4lUi3eNMEB1ZfkYzdpr6aHAHCDORt6X3ULK3sL6wuRzb32RHtrzO59gZz5AciRlxuQWs4Hf0FUc5FsY_rvBeZfZzPG-N2jkXNjmTv3IFTpBpVIfZm8P-tBKYmG0akdeTBZvHn7L78eaqidzorGgIHNCJcjoon0vB34XOkacExmQMf8TTTpDH-e91pfKQiuzztoAlB8djEE0YVlU', '幽靜的竹林小徑。', '#9333ea', FALSE),
+  ('00000000-0000-0000-0000-000000000006', '大笨鐘', '倫敦', '英國', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAiuTlQofVSv4DU4IwJhi75YdMu0SgK22rY1lcXYL3uG_VycPa9ovRDzvkVp6AHGUS22BsNZga6Ybv78S48B3HqNhskF2tXyzypSGySuPr8WurB2bEMxevKN9WuXpTbZ-SQzyGbUTQPn2j1ZoA0utyAjDhpoeuu0k0fBkpxsXeXqxmlukUMrn0jU_MNKgTJqETXGfr_gNwoRrcvCiCTkbIkw_wQBRfJHtako_NEza4ciAYyiA75CJy3sIhp7ZeRvqHDWAIpitFyoLuN', '倫敦的地標建築。', '#ec4899', FALSE)
+ON CONFLICT DO NOTHING;

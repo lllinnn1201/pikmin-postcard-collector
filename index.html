@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant" class="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>皮克敏明信片</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Material Symbols Outlined -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: "#56b67a",
+              secondary: "#E2F6E7",
+              accent: "#FDE64B",
+              nintendo: "#E60012",
+              "background-light": "#f6f7f7",
+              "background-dark": "#151d18",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1a2c20",
+              "text-main-light": "#111813",
+              "text-main-dark": "#e0e6e2",
+              "text-sec-light": "#61896f",
+              "text-sec-dark": "#8fa898"
+            },
+            fontFamily: {
+              display: ["Plus Jakarta Sans", "Noto Sans TC", "sans-serif"],
+              sans: ["Plus Jakarta Sans", "Noto Sans TC", "sans-serif"]
+            },
+            boxShadow: {
+              soft: "0 4px 20px -2px rgba(43, 238, 108, 0.15)",
+              card: "0 2px 10px rgba(0, 0, 0, 0.03)"
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      body { background-color: #f6f7f7; }
+      .dark body { background-color: #151d18; }
+      .bg-pattern {
+        background-image: radial-gradient(#56b67a 1px, transparent 1px);
+        background-size: 24px 24px;
+        opacity: 0.1;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="antialiased">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
