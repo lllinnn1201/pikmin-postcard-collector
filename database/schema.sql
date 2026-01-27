@@ -136,7 +136,7 @@ BEGIN
     COALESCE(
       NEW.raw_user_meta_data->>'name', 
       CASE 
-        WHEN NEW.email LIKE '%@pikmin.internal' THEN SPLIT_PART(NEW.email, '@', 1)
+        WHEN NEW.email LIKE '%@pikmin.com' THEN SPLIT_PART(NEW.email, '@', 1)
         ELSE NEW.email
       END,
       '新探險家'

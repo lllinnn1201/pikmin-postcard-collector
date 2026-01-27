@@ -57,7 +57,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const hex = Array.from(data)
             .map(b => b.toString(16).padStart(2, '0'))
             .join('');
-        return `${hex}@pikmin.internal`;
+        // 改用 .com 結尾，因為 .internal 會被 Supabase 的 Email 格式檢查擋下
+        return `${hex}@pikmin.com`;
     };
 
     // 帳號名稱登入（內部轉換為 Hex 編碼 Email）
