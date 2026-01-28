@@ -456,10 +456,12 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                         if (viewport) {
                           const originalContent = viewport.getAttribute('content');
                           if (originalContent) {
-                            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0');
+                            // 強制重置 iOS Zoom: 加入 user-scalable=0 增加強制性
+                            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+                            // 延長至 300ms 確保瀏覽器有足夠時間重繪
                             setTimeout(() => {
                               viewport.setAttribute('content', originalContent);
-                            }, 100);
+                            }, 300);
                           }
                         }
                       }}
