@@ -359,7 +359,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                         <p className="text-xs font-medium">{validationError}</p>
                       </div>
                     )}
-                    <p className="text-[11px] text-gray-500 font-medium">尚未有寄送紀錄，你可以手動標註收件人：</p> // 修改「您」為「你」
+                    <p className="text-[11px] text-gray-500 font-medium">尚未有寄送紀錄，你可以手動標註收件人：</p>
                     <div className="flex gap-2">
                       <div className="flex-1 relative">
                         <input
