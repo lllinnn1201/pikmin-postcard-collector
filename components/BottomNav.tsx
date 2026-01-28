@@ -11,7 +11,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, onNavigate }) => {
   // 新增標籤：上傳與朋友
   const navItems: { label: string, icon: string, view: ViewState }[] = [
     { label: '上傳', icon: 'add_circle', view: 'upload' },
-    { label: '明信片', icon: 'grass', view: 'collection' },
+    { label: '明信片', icon: 'style', view: 'collection' },
     { label: '皮友', icon: 'group', view: 'friends' },
     { label: '紀錄', icon: 'calendar_month', view: 'records' }
   ];
