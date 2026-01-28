@@ -4,6 +4,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { usePostcards } from './usePostcards';
+import { useExchangeRecords } from './useExchangeRecords';
 import { Friend } from '../types';
 
 // 從資料庫行轉換為前端 Friend 型別
@@ -32,6 +34,8 @@ const mapRowToFriend = (row: any): Friend => {
 
 export const useFriends = () => {
     const { user } = useAuth();                            // 取得當前使用者
+    const { fetchPostcards } = usePostcards();             // 取得明信片刷新函式
+    const { fetchRecords } = useExchangeRecords();         // 取得紀錄刷新函式
     const [friends, setFriends] = useState<Friend[]>([]);  // 好友列表
     const [loading, setLoading] = useState(true);          // 載入中狀態
     const [error, setError] = useState<string | null>(null); // 錯誤訊息
@@ -201,6 +205,10 @@ export const useFriends = () => {
 
             if (updateError) throw updateError;
 
+            // 更新成功後，刷新明信片與交換紀錄，確保名稱同步顯示
+            fetchPostcards();
+            fetchRecords();
+
             return { error: null };
         } catch (err: any) {
             // 回滾更新：重新取得資料
@@ -251,6 +259,10 @@ export const useFriends = () => {
                 .eq('id', friendId);
 
             if (updateError) throw updateError; // 更新失敗時拋出錯誤
+
+            // 更新成功後，刷新明信片與交換紀錄，確保頭像同步顯示
+            fetchPostcards();
+            fetchRecords();
 
             return { error: null }; // 成功
         } catch (err: any) {

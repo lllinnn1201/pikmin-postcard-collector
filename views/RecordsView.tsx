@@ -15,6 +15,23 @@ const RecordsView: React.FC = () => {
   // 分類標籤狀態（全部 / 我的最愛）
   const [filterTab, setFilterTab] = React.useState<'all' | 'favorites'>('all');
 
+  // 判斷字元類型：中文、英文、特殊符號
+  const getCharType = (char: string): number => {
+    if (/[\u4e00-\u9fff]/.test(char)) return 0; // 中文優先
+    if (/[a-zA-Z]/.test(char)) return 1; // 英文次之
+    return 2; // 特殊符號最後
+  };
+
+  // 名稱排序比較函式（中文筆畫、英文 A~Z、特殊符號）
+  const compareName = React.useCallback((a: string, b: string): number => {
+    const typeA = getCharType(a.charAt(0));
+    const typeB = getCharType(b.charAt(0));
+    // 先按類型排序
+    if (typeA !== typeB) return typeA - typeB;
+    // 同類型則使用 localeCompare（中文會按筆畫排序）
+    return a.localeCompare(b, 'zh-Hant-TW', { sensitivity: 'base' });
+  }, []);
+
   // 載入狀態：任一資料尚未載入完成
   const loading = recordsLoading || friendsLoading;
 
@@ -84,11 +101,15 @@ const RecordsView: React.FC = () => {
       }
       // 如果該好友有寄送紀錄，使用紀錄中的資料，但保持好友的 ID 和收藏狀態
       if (existingRecord) {
+        // 對明信片進行筆畫排序
+        const sortedPostcards = [...existingRecord.postcards].sort((a, b) => compareName(a.title, b.title));
+
         return {
           ...existingRecord,
           friendId: friend.id, // 使用好友的真正 ID
           friendName: friend.name, // 使用好友的真正名稱
           friendAvatar: friend.avatar,
+          postcards: sortedPostcards, // 使用排序後的清單
           isFavorite: friend.isFavorite, // 保留收藏狀態
         };
       }
@@ -103,24 +124,7 @@ const RecordsView: React.FC = () => {
     });
 
     return result;
-  }, [friends, apiGroupedRecords]);
-
-  // 判斷字元類型：中文、英文、特殊符號
-  const getCharType = (char: string): number => {
-    if (/[\u4e00-\u9fff]/.test(char)) return 0; // 中文優先
-    if (/[a-zA-Z]/.test(char)) return 1; // 英文次之
-    return 2; // 特殊符號最後
-  };
-
-  // 名稱排序比較函式（中文筆畫、英文 A~Z、特殊符號）
-  const compareName = (a: string, b: string): number => {
-    const typeA = getCharType(a.charAt(0));
-    const typeB = getCharType(b.charAt(0));
-    // 先按類型排序
-    if (typeA !== typeB) return typeA - typeB;
-    // 同類型則使用 localeCompare（中文會按筆畫排序）
-    return a.localeCompare(b, 'zh-Hant-TW', { sensitivity: 'base' });
-  };
+  }, [friends, apiGroupedRecords, compareName]); // 加入 compareName 到依賴項
 
   // 根據搜尋字串和分類過濾分組紀錄 (按好友名稱搜尋)，並按名稱排序
   const filteredRecords = mergedRecords

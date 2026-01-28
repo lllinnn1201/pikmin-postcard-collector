@@ -114,7 +114,7 @@ export const useExchangeRecords = () => {
             // 轉換手動標註紀錄為 ExchangeRecord 格式
             const manualRecords: ExchangeRecord[] = (manualData || []).map((row: any) => ({
                 id: row.id,
-                friendId: `manual-${row.sent_to}`, // 使用名稱作為虛擬 ID
+                friendId: row.sent_to, // 使用名稱作為虛擬 ID，與朋友列表同步
                 friendName: row.sent_to,
                 friendAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(row.sent_to)}&background=7dd3fc&color=fff&bold=true`, // 使用簡潔的縮寫頭像
                 date: new Date(row.collected_date).toLocaleDateString('zh-TW', {

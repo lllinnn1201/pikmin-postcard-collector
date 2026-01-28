@@ -1,6 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { usePostcards } from '../hooks/usePostcards';
+import { useFriends } from '../hooks/useFriends';
 
 const UploadView: React.FC = () => {
     const { addPostcard, uploadImage } = usePostcards();
@@ -12,6 +13,10 @@ const UploadView: React.FC = () => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+    // 好友相關狀態
+    const { friends } = useFriends();
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const [formData, setFormData] = useState({
         title: '',
         location: '',
@@ -20,6 +25,7 @@ const UploadView: React.FC = () => {
         description: '',
         color: '#ed6c00',
         collectedDate: new Date().toISOString().split('T')[0],
+        sentTo: '', // 新增：寄送給哪位好友
     });
 
     // 處理檔案選擇
@@ -57,11 +63,20 @@ const UploadView: React.FC = () => {
             if (uploadResult.error) throw new Error(uploadResult.error);
             if (!uploadResult.data) throw new Error('圖片上傳失敗，未取得網址');
 
-            // 2. 儲存明信片資料
+            // 2. 驗證好友是否存在 (若有填寫)
+            if (formData.sentTo.trim()) {
+                const matchedFriend = friends.find(f => f.name.toLowerCase() === formData.sentTo.trim().toLowerCase());
+                if (!matchedFriend) {
+                    throw new Error('此好友尚未新增，請先至「好友」頁面新增好友後再寄送。');
+                }
+            }
+
+            // 3. 儲存明信片資料
             const result = await addPostcard({
                 ...formData,
                 imageUrl: uploadResult.data,
                 isSpecial: formData.category === '花瓣', // 如果是花瓣，則設為特殊
+                sentTo: formData.sentTo || undefined, // 新增：存入寄送者
                 description: `${formData.category} - ${formData.description}` // 將分類存入描述開頭
             });
 
@@ -78,6 +93,7 @@ const UploadView: React.FC = () => {
                     description: '',
                     color: '#ed6c00',
                     collectedDate: new Date().toISOString().split('T')[0],
+                    sentTo: '',
                 });
                 setSelectedFile(null);
                 setPreviewUrl(null);
@@ -93,6 +109,42 @@ const UploadView: React.FC = () => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+    // --- 好友頭像同步邏輯 (與 DetailView 一致) ---
+    // 取得重複名稱列表（用於分配不同顏色）
+    const getDuplicateNames = () => {
+        const nameCount: Record<string, number> = {};
+        friends.forEach(f => {
+            nameCount[f.name] = (nameCount[f.name] || 0) + 1;
+        });
+        return Object.keys(nameCount).filter(name => nameCount[name] > 1);
+    };
+    const duplicateNames = getDuplicateNames();
+
+    // 根據名稱生成背景色
+    const getAvatarColor = (name: string, friendId: string) => {
+        const colors = [
+            'bg-sky-500', 'bg-rose-500', 'bg-emerald-500', 'bg-amber-500', 'bg-violet-500',
+            'bg-orange-500', 'bg-teal-500', 'bg-pink-500', 'bg-lime-500', 'bg-indigo-500',
+        ];
+        const hashSource = duplicateNames.includes(name) ? name + friendId : name;
+        let hash = 0;
+        for (let i = 0; i < hashSource.length; i++) {
+            hash = hashSource.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return colors[Math.abs(hash) % colors.length];
+    };
+
+    // 判斷是否為自訂頭像
+    const isCustomAvatar = (avatar: string) => {
+        return avatar && !avatar.includes('ui-avatars.com') && !avatar.includes('placeholder');
+    };
+
+    // 取得顯示名稱的首字母
+    const getInitials = (name: string) => {
+        return name.slice(0, 2).toUpperCase();
+    };
+    // ---------------------------------------
 
     return (
         <div className="flex flex-col h-full min-h-screen bg-[#f6f7f7] px-4 pt-10 pb-28">
@@ -175,6 +227,57 @@ const UploadView: React.FC = () => {
                                     className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>
+                        </div>
+
+                        {/* 寄送好友 */}
+                        <div className="relative">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">寄送好友</label>
+                            <input
+                                name="sentTo"
+                                value={formData.sentTo}
+                                onChange={(e) => {
+                                    handleChange(e);
+                                    setShowSuggestions(true);
+                                }}
+                                onFocus={() => setShowSuggestions(true)}
+                                placeholder="皮友名稱（選填）"
+                                className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
+                            />
+
+                            {/* 好友建議選單 */}
+                            {showSuggestions && formData.sentTo && friends.filter(f => f.name.toLowerCase().includes(formData.sentTo.toLowerCase())).length > 0 && (
+                                <div className="absolute z-[110] left-0 right-0 top-full mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-200">
+                                    {friends
+                                        .filter(f => f.name.toLowerCase().includes(formData.sentTo.toLowerCase()))
+                                        .map(friend => (
+                                            <div
+                                                key={friend.id}
+                                                onClick={() => {
+                                                    setFormData(prev => ({ ...prev, sentTo: friend.name }));
+                                                    setShowSuggestions(false);
+                                                }}
+                                                className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0"
+                                            >
+                                                {isCustomAvatar(friend.avatar) ? (
+                                                    <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
+                                                        <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
+                                                    </div>
+                                                ) : (
+                                                    <div className={`w-10 h-10 rounded-full ${getAvatarColor(friend.name, friend.id)} border-2 border-white flex items-center justify-center shadow-sm shrink-0`}>
+                                                        <span className="text-white font-black text-xs tracking-tighter">
+                                                            {getInitials(friend.name)}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <span className="text-sm font-bold text-slate-700">{friend.name}</span>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            )}
+
+                            {/* 點擊外部隱藏建議 */}
+                            {showSuggestions && <div className="fixed inset-0 z-40" onClick={() => setShowSuggestions(false)} />}
                         </div>
 
                         <div>

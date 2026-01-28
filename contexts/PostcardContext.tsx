@@ -22,6 +22,7 @@ interface PostcardContextType {
         collectedDate: string;
         category: string;
         isSpecial?: boolean;
+        sentTo?: string;
     }) => Promise<{ error: string | null }>;
     updatePostcardSentTo: (postcardId: string, sentTo: string | null) => Promise<{ error: string | null }>;
     updatePostcard: (postcardId: string, updates: {
@@ -211,6 +212,7 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     user_id: user.id,
                     postcard_id: postcardData.id,
                     collected_date: data.collectedDate,
+                    sent_to: data.sentTo || null,
                 });
 
             if (userPostcardError) throw userPostcardError;

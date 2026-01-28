@@ -1,5 +1,6 @@
 -- =====================================================
 -- 皮克敏明信片收藏館 - 最終整合腳本 (資料庫 + 儲存空間)
+-- 支援「帳號名稱」登入與自動 Profile 建立
 -- =====================================================
 
 -- 1. 建立/更新基礎資料表 (Profiles)
@@ -102,6 +103,18 @@ CREATE POLICY "所有人可讀取 postcards" ON public.postcards FOR SELECT USIN
 DROP POLICY IF EXISTS "登入使用者可新增 postcards" ON public.postcards;
 CREATE POLICY "登入使用者可新增 postcards" ON public.postcards FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
+-- Postcards: 允許使用者刪除自己的明信片
+DROP POLICY IF EXISTS "使用者可刪除自己的 postcards" ON public.postcards;
+CREATE POLICY "使用者可刪除自己的 postcards" ON public.postcards FOR DELETE USING (
+  id IN (SELECT postcard_id FROM public.user_postcards WHERE user_id = auth.uid())
+);
+
+-- Postcards: 允許使用者更新自己的明信片
+DROP POLICY IF EXISTS "使用者可更新自己的 postcards" ON public.postcards;
+CREATE POLICY "使用者可更新自己的 postcards" ON public.postcards FOR UPDATE USING (
+  id IN (SELECT postcard_id FROM public.user_postcards WHERE user_id = auth.uid())
+);
+
 -- User Postcards & Friends: 僅限本人操作
 DROP POLICY IF EXISTS "使用者可操作自己的 user_postcards" ON public.user_postcards;
 CREATE POLICY "使用者可操作自己的 user_postcards" ON public.user_postcards FOR ALL USING (auth.uid() = user_id);
@@ -128,15 +141,13 @@ CREATE POLICY "使用者可管理自己的明信片圖片" ON storage.objects FO
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- 建立新使用者時，自動從 meta_data 或 email 中提取資訊
-  -- 如果 email 結尾是 @pikmin.internal，則去除該後綴作為初始用戶名
   INSERT INTO public.profiles (id, username, avatar)
   VALUES (
     NEW.id, 
     COALESCE(
       NEW.raw_user_meta_data->>'name', 
       CASE 
-        WHEN NEW.email LIKE '%@pikmin.com' THEN SPLIT_PART(NEW.email, '@', 1)
+        WHEN NEW.email LIKE '%@pikmin.internal' THEN SPLIT_PART(NEW.email, '@', 1)
         ELSE NEW.email
       END,
       '新探險家'
@@ -151,3 +162,34 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- 12. 好友資訊同步觸發器 (同步更新 user_postcards 與 exchange_records)
+CREATE OR REPLACE FUNCTION public.sync_friend_info_update()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- 當名稱或頭像發生變更時進行同步
+  IF (OLD.friend_name IS DISTINCT FROM NEW.friend_name) OR 
+     (OLD.friend_avatar IS DISTINCT FROM NEW.friend_avatar) THEN
+    
+    -- 12.1 同步更新「我的明信片」標記 (user_postcards)
+    UPDATE public.user_postcards
+    SET sent_to = NEW.friend_name
+    WHERE user_id = NEW.user_id AND sent_to = OLD.friend_name;
+    
+    -- 12.2 同步更新「寄送紀錄」(不論收件者是否已註冊)
+    UPDATE public.exchange_records
+    SET receiver_name = NEW.friend_name
+    WHERE sender_id = NEW.user_id AND receiver_name = OLD.friend_name;
+
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- 掛載同步觸發器
+DROP TRIGGER IF EXISTS on_friend_name_updated ON public.friends;
+DROP TRIGGER IF EXISTS on_friend_info_updated ON public.friends;
+
+CREATE TRIGGER on_friend_info_updated
+  AFTER UPDATE OF friend_name, friend_avatar ON public.friends
+  FOR EACH ROW EXECUTE FUNCTION public.sync_friend_info_update();
