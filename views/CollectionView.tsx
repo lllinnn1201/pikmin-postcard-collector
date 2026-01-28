@@ -124,7 +124,7 @@ const CollectionView: React.FC<CollectionViewProps> = ({
       </header>
 
       {/* 搜尋欄 */}
-      <div className="px-6 pb-2">
+      <div className="px-4 pb-2">
         <div className="relative flex items-center w-full h-12 shadow-soft rounded-full bg-white dark:bg-white/5 border border-gray-100/50 focus-within:border-primary/50 transition-all overflow-hidden group">
           <div className="absolute left-4 flex items-center justify-center text-primary/60">
             <span className="material-symbols-outlined text-[22px]">search</span>
@@ -140,7 +140,7 @@ const CollectionView: React.FC<CollectionViewProps> = ({
       </div>
 
       {/* 分類篩選標籤 */}
-      <div className="px-6 py-4 overflow-x-auto hide-scrollbar">
+      <div className="px-4 py-4 overflow-x-auto hide-scrollbar">
         <div className="flex gap-3 min-w-max">
           {categories.map((label) => (
             <button
