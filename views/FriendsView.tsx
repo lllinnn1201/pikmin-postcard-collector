@@ -261,33 +261,8 @@ const FriendsView: React.FC = () => {
                                             </span>
                                         </div>
                                     )}
-                                    {/* 按鈕組合 - 右下角 */}
-                                    <div className="absolute -bottom-0.5 -right-0.5 flex gap-1">
-                                        {/* 恢復預設按鈕 - 僅在自訂頭像時顯示 */}
-                                        {isCustomAvatar(friend.avatar) && (
-                                            <button
-                                                onClick={() => resetFriendAvatar(friend.id)}
-                                                className="w-6 h-6 bg-white rounded-full shadow-md border border-gray-100 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
-                                                title="恢復預設頭像"
-                                            >
-                                                <span className="material-symbols-outlined text-[14px]">history</span>
-                                            </button>
-                                        )}
-                                        {/* 相機圖示 */}
-                                        <button
-                                            onClick={() => handleCameraClick(friend.id)}
-                                            disabled={uploadingAvatarId === friend.id}
-                                            className="w-6 h-6 bg-white rounded-full shadow-md border border-gray-100 flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary/5 transition-all active:scale-90 disabled:opacity-50"
-                                        >
-                                            {uploadingAvatarId === friend.id ? (
-                                                // 上傳中顯示載入圖示
-                                                <span className="material-symbols-outlined text-[14px] animate-spin">refresh</span>
-                                            ) : (
-                                                // 正常顯示相機圖示
-                                                <span className="material-symbols-outlined text-[14px]">photo_camera</span>
-                                            )}
-                                        </button>
-                                    </div>
+                                    {/* 由於現在移至編輯彈窗，這裡不再顯示按鈕組合 */}
+
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
@@ -374,7 +349,7 @@ const FriendsView: React.FC = () => {
                 </div>
             )}
 
-            {/* 編輯名稱對話框 */}
+            {/* 編輯皮友對話框 */}
             {friendToEdit && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     {/* 背景遮罩 */}
@@ -383,45 +358,103 @@ const FriendsView: React.FC = () => {
                         onClick={() => setFriendToEdit(null)}
                     />
                     {/* 對話框內容 */}
-                    <div className="relative bg-white rounded-3xl p-6 mx-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
-                        {/* 圖示 */}
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="material-symbols-outlined text-primary text-3xl">edit</span>
+                    <div className="relative bg-white rounded-[40px] p-8 mx-6 shadow-2xl max-w-sm w-full animate-in zoom-in-95 duration-200">
+                        {/* 標題與圖示 */}
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="material-symbols-outlined text-primary text-3xl">edit</span>
+                            </div>
+                            <h3 className="text-2xl font-black text-slate-800">
+                                編輯皮友
+                            </h3>
                         </div>
-                        {/* 標題 */}
-                        <h3 className="text-xl font-black text-slate-800 text-center mb-4">
-                            編輯皮友名稱
-                        </h3>
-                        {/* 輸入框 */}
-                        <input
-                            type="text"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            placeholder="輸入新名稱"
-                            className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold mb-6"
-                            autoFocus
-                        />
+
+                        {/* 頭像編輯區域 */}
+                        <div className="flex flex-col items-center mb-8">
+                            <div className="relative group">
+                                {friends.find(f => f.id === friendToEdit.id) && (
+                                    <>
+                                        {/* 頭像顯示 */}
+                                        {isCustomAvatar(friends.find(f => f.id === friendToEdit.id)!.avatar) ? (
+                                            <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-slate-100">
+                                                <img
+                                                    src={friends.find(f => f.id === friendToEdit.id)!.avatar}
+                                                    alt={friendToEdit.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className={`w-32 h-32 rounded-full ${getAvatarColor(friendToEdit.name, friendToEdit.id)} border-4 border-white flex items-center justify-center shadow-xl`}>
+                                                <span className="text-white font-black text-4xl tracking-tighter">
+                                                    {getInitials(friendToEdit.name)}
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* 編輯按鈕組 */}
+                                        <div className="absolute -bottom-2 flex gap-3 w-full justify-center">
+                                            {/* 恢復預設按鈕 */}
+                                            {isCustomAvatar(friends.find(f => f.id === friendToEdit.id)!.avatar) && (
+                                                <button
+                                                    onClick={() => resetFriendAvatar(friendToEdit.id)}
+                                                    className="w-12 h-12 bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+                                                    title="恢復預設頭像"
+                                                >
+                                                    <span className="material-symbols-outlined text-[24px]">history</span>
+                                                </button>
+                                            )}
+                                            {/* 相機按鈕 */}
+                                            <button
+                                                onClick={() => handleCameraClick(friendToEdit.id)}
+                                                disabled={uploadingAvatarId === friendToEdit.id}
+                                                className="w-12 h-12 bg-white rounded-2xl shadow-lg border border-gray-100 flex items-center justify-center text-slate-400 hover:text-primary hover:bg-primary/5 transition-all active:scale-90 disabled:opacity-50"
+                                            >
+                                                {uploadingAvatarId === friendToEdit.id ? (
+                                                    <span className="material-symbols-outlined text-[24px] animate-spin">refresh</span>
+                                                ) : (
+                                                    <span className="material-symbols-outlined text-[24px]">photo_camera</span>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* 名稱輸入框 */}
+                        <div className="mb-8">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block px-1">皮友名稱</label>
+                            <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                placeholder="輸入新名稱"
+                                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold text-lg"
+                                autoFocus
+                            />
+                        </div>
+
                         {/* 按鈕區 */}
-                        <div className="flex gap-3">
+                        <div className="flex gap-4">
                             {/* 取消按鈕 */}
                             <button
                                 onClick={() => setFriendToEdit(null)}
-                                className="flex-1 py-3 px-4 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-all active:scale-95"
+                                className="flex-1 py-4 px-4 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-all active:scale-95 text-base"
                             >
                                 取消
                             </button>
                             {/* 確定修改按鈕 */}
                             <button
                                 onClick={async () => {
-                                    if (editName.trim() && editName.trim() !== friendToEdit.name) {
+                                    if (editName.trim()) {
                                         await updateFriendName(friendToEdit.id, editName.trim());
                                     }
                                     setFriendToEdit(null);
                                 }}
                                 disabled={!editName.trim()}
-                                className="flex-1 py-3 px-4 rounded-2xl bg-primary text-white font-bold hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 py-4 px-4 rounded-2xl bg-primary text-white font-bold hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-base"
                             >
-                                <span className="material-symbols-outlined text-[18px]">check</span>
+                                <span className="material-symbols-outlined text-[20px]">check</span>
                                 確定
                             </button>
                         </div>

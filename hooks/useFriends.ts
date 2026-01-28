@@ -205,7 +205,7 @@ export const useFriends = () => {
 
             if (updateError) throw updateError;
 
-            // 更新成功後，刷新明信片與交換紀錄，確保名稱同步顯示
+            // 更新成功後，刷新明信片與交換紀錄，確保各頁面名稱同步顯示
             fetchPostcards();
             fetchRecords();
 
@@ -260,7 +260,7 @@ export const useFriends = () => {
 
             if (updateError) throw updateError; // 更新失敗時拋出錯誤
 
-            // 更新成功後，刷新明信片與交換紀錄，確保頭像同步顯示
+            // 更新成功後，刷新明信片與交換紀錄，確保各頁面頭像同步顯示
             fetchPostcards();
             fetchRecords();
 
