@@ -76,7 +76,7 @@ const UploadView: React.FC = () => {
                 ...formData,
                 imageUrl: uploadResult.data,
                 isSpecial: formData.category === '花瓣', // 如果是花瓣，則設為特殊
-                sentTo: formData.sentTo || undefined, // 新增：存入寄送者
+                sentTo: formData.sentTo.trim() ? [formData.sentTo.trim()] : undefined, // 新增：存入寄送者
                 description: `${formData.category} - ${formData.description}` // 將分類存入描述開頭
             });
 
