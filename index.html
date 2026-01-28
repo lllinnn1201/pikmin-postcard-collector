@@ -69,7 +69,39 @@
       background-size: 24px 24px;
       opacity: 0.1;
     }
+
+    /* 防止 Material Symbols 在下載完成前顯示亂碼 (FOIT) */
+    .material-symbols-outlined {
+      display: inline-block;
+      min-width: 1em;
+      min-height: 1em;
+    }
+
+    /* 在 HTML 元素上有 wf-loading class 時，隱藏所有圖示文字 */
+    html.wf-loading .material-symbols-outlined {
+      visibility: hidden;
+    }
   </style>
+  <!-- 字體載入監測 -->
+  <script>
+    if ('fonts' in document) {
+      document.documentElement.classList.add('wf-loading');
+      Promise.all([
+        document.fonts.load('1em Material Symbols Outlined'),
+        document.fonts.load('1em Plus Jakarta Sans'),
+        document.fonts.load('1em Noto Sans TC')
+      ]).then(() => {
+        document.documentElement.classList.remove('wf-loading');
+      }).catch(() => {
+        document.documentElement.classList.remove('wf-loading');
+      });
+
+      // 安全回退：3秒後強制移除 loading 狀態
+      setTimeout(() => {
+        document.documentElement.classList.remove('wf-loading');
+      }, 3000);
+    }
+  </script>
   <script type="importmap">
 {
   "imports": {
