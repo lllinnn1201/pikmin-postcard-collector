@@ -331,7 +331,7 @@ const UploadView: React.FC = () => {
                     {success && (
                         <div className="p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-2">
                             <span className="material-symbols-outlined text-green-500 text-sm">check_circle</span>
-                            <p className="text-green-600 text-xs font-bold leading-relaxed">成功加入收藏箱！</p>
+                            <p className="text-green-600 text-xs font-bold leading-relaxed">成功加入我的明信片！</p>
                         </div>
                     )}
 
