@@ -1,7 +1,13 @@
 -- =====================================================
 -- 皮克敏明信片收藏館 - 最終整合腳本 (資料庫 + 儲存空間)
 -- 支援「帳號名稱」登入與自動 Profile 建立
+-- 設定時區為台北時間 (UTC+8)
 -- =====================================================
+
+-- 0. 時區設定 (Timezone Settings)
+ALTER DATABASE postgres SET timezone TO 'Asia/Taipei';
+ALTER ROLE postgres SET timezone TO 'Asia/Taipei';
+SET timezone TO 'Asia/Taipei';
 
 -- 1. 建立/更新基礎資料表 (Profiles)
 CREATE TABLE IF NOT EXISTS public.profiles (
