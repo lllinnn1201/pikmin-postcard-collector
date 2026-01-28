@@ -145,7 +145,7 @@ const RecordsView: React.FC = () => {
       </header>
 
       {/* 搜尋欄 - 與其他頁面樣式一致 */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="relative flex items-center w-full h-12 shadow-soft rounded-full bg-white border border-gray-100/50 focus-within:border-primary/50 transition-all overflow-hidden group">
           <div className="absolute left-4 flex items-center justify-center text-primary/60">
             <span className="material-symbols-outlined text-[22px]">search</span>
@@ -179,7 +179,7 @@ const RecordsView: React.FC = () => {
 
       {/* 皮友紀錄列表 */}
       {!loading && (
-        <div className="space-y-10">
+        <div className="space-y-6">
           {/* 分類標籤 */}
           <div className="flex gap-2">
             <button
@@ -237,7 +237,7 @@ const RecordsView: React.FC = () => {
               {/* 明信片水平捲動清單（如果有明信片才顯示） */}
               {group.postcards.length > 0 ? (
                 <div
-                  className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 pb-4 snap-x snap-mandatory"
+                  className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 pb-2 snap-x snap-mandatory"
                 >
                   {/* 左側間距元件 (16px gap + 16px spacer = 32px) */}
                   <div className="flex-none w-4 snap-start" aria-hidden="true" />
