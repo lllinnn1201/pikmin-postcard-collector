@@ -59,21 +59,34 @@ const UploadView: React.FC = () => {
         setSuccess(false);
 
         try {
-            // 1. 上傳圖片到 Storage
+            // 1. 驗證好友是否存在 (若輸入框有文字但未點選)
+            let finalFriends = [...selectedFriends];
+            if (searchTerm.trim()) {
+                const matchedFriend = friends.find(
+                    (f) => f.name.toLowerCase() === searchTerm.trim().toLowerCase()
+                );
+                if (!matchedFriend) {
+                    setError('此皮友尚未新增，請先至「皮友」頁面新增皮友後再寄送。');
+                    setLoading(false);
+                    return;
+                }
+                // 如果在名單中但不在已選清單，則加入
+                if (!finalFriends.includes(matchedFriend.name)) {
+                    finalFriends.push(matchedFriend.name);
+                }
+            }
+
+            // 2. 上傳圖片到 Storage
             const uploadResult = await uploadImage(selectedFile);
             if (uploadResult.error) throw new Error(uploadResult.error);
             if (!uploadResult.data) throw new Error('圖片上傳失敗，未取得網址');
-
-            // 2. 驗證好友是否存在 (若有填寫)
-            // 這裡已經透過選單選擇，理論上都是存在的，但若有手動輸入可能需要額外檢查
-            // 不過本邏輯改為只能透過選單加入，因此略過
 
             // 3. 儲存明信片資料
             const result = await addPostcard({
                 ...formData,
                 imageUrl: uploadResult.data,
                 isSpecial: formData.category === '花瓣', // 如果是花瓣，則設為特殊
-                sentTo: selectedFriends.length > 0 ? selectedFriends : undefined, // 存入多位寄送者
+                sentTo: finalFriends.length > 0 ? finalFriends : undefined, // 存入多位寄送者
                 description: `${formData.category} - ${formData.description}` // 將分類存入描述開頭
             });
 
