@@ -150,7 +150,7 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 .insert({
                     user_id: user.id,
                     postcard_id: postcardId,
-                    collected_date: new Date().toISOString().split('T')[0],
+                    collected_date: new Date().toLocaleDateString('en-CA'), // 使用本地日期 (YYYY-MM-DD 格式)
                 });
 
             if (insertError) throw insertError;

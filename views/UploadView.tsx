@@ -26,7 +26,7 @@ const UploadView: React.FC = () => {
         category: '蘑菇', // 預設改為蘑菇
         description: '',
         color: '#ed6c00',
-        collectedDate: new Date().toISOString().split('T')[0],
+        collectedDate: new Date().toLocaleDateString('en-CA'), // 使用本地日期 (YYYY-MM-DD 格式)
     });
 
     // 處理檔案選擇
@@ -102,7 +102,7 @@ const UploadView: React.FC = () => {
                     category: '蘑菇',
                     description: '',
                     color: '#ed6c00',
-                    collectedDate: new Date().toISOString().split('T')[0],
+                    collectedDate: new Date().toLocaleDateString('en-CA'), // 使用本地日期 (YYYY-MM-DD 格式)
                 });
                 setSelectedFriends([]);
                 setSearchTerm('');
@@ -178,7 +178,7 @@ const UploadView: React.FC = () => {
                 <p className="text-sm text-slate-400">從相簿挑選新收集的明信片</p>
             </header>
 
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100">
+            <div className="bg-white rounded-[32px] pt-3 px-6 pb-6 shadow-sm border border-gray-100">
                 <form onSubmit={handleSubmit} className="space-y-5">
                     {/* 隱藏的 Input */}
                     <input
@@ -190,32 +190,35 @@ const UploadView: React.FC = () => {
                     />
 
                     {/* 圖片上傳/預覽區 */}
-                    <div
-                        onClick={triggerFileInput}
-                        className={`
+                    <div>
+                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">明信片</label>
+                        <div
+                            onClick={triggerFileInput}
+                            className={`
               relative aspect-[3/2] w-full bg-slate-50 rounded-2xl overflow-hidden border-2 border-dashed transition-all cursor-pointer
               ${previewUrl ? 'border-primary/30' : 'border-slate-200 hover:border-primary/50'}
               flex items-center justify-center group
             `}
-                    >
-                        {previewUrl ? (
-                            <>
-                                <img src={previewUrl} alt="預覽" className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <span className="text-white font-black text-sm bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">點擊更換圖片</span>
+                        >
+                            {previewUrl ? (
+                                <>
+                                    <img src={previewUrl} alt="預覽" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <span className="text-white font-black text-sm bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">點擊更換圖片</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex flex-col items-center gap-3 text-slate-400 group-hover:text-primary transition-colors">
+                                    <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-3xl">add_a_photo</span>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className="text-sm font-black">點擊開啟相簿</p>
+                                        <p className="text-[10px] font-bold opacity-60 mt-0.5 uppercase tracking-tighter">支援 JPG, PNG 格式</p>
+                                    </div>
                                 </div>
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center gap-3 text-slate-400 group-hover:text-primary transition-colors">
-                                <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center">
-                                    <span className="material-symbols-outlined text-3xl">add_a_photo</span>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-sm font-black">點擊開啟相簿</p>
-                                    <p className="text-[10px] font-bold opacity-60 mt-0.5 uppercase tracking-tighter">支援 JPG, PNG 格式</p>
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-4">
@@ -342,7 +345,7 @@ const UploadView: React.FC = () => {
                         </div>
 
                         <div>
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block px-1">明信片分類</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block px-1">分類</label>
                             <div className="flex gap-4 px-1">
                                 {['蘑菇', '探險', '花瓣'].map((cat) => (
                                     <div
@@ -382,19 +385,23 @@ const UploadView: React.FC = () => {
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-2">
-                            <span className="material-symbols-outlined text-red-500 text-sm mt-0.5">error</span>
-                            <p className="text-red-500 text-xs font-bold leading-relaxed flex-1">{error}</p>
-                        </div>
-                    )}
+                    {
+                        error && (
+                            <div className="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-2">
+                                <span className="material-symbols-outlined text-red-500 text-sm mt-0.5">error</span>
+                                <p className="text-red-500 text-xs font-bold leading-relaxed flex-1">{error}</p>
+                            </div>
+                        )
+                    }
 
-                    {success && (
-                        <div className="p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-green-500 text-sm">check_circle</span>
-                            <p className="text-green-600 text-xs font-bold leading-relaxed">成功加入我的明信片！</p>
-                        </div>
-                    )}
+                    {
+                        success && (
+                            <div className="p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                                <p className="text-green-600 text-xs font-bold leading-relaxed">成功加入我的明信片！</p>
+                            </div>
+                        )
+                    }
 
                     <button
                         disabled={loading}
@@ -409,9 +416,9 @@ const UploadView: React.FC = () => {
                         <span className="material-symbols-outlined font-bold">{loading ? 'sync' : 'cloud_upload'}</span>
                         <span className="font-black tracking-widest uppercase">{loading ? '正在上傳圖片...' : '確認上傳明信片'}</span>
                     </button>
-                </form>
-            </div>
-        </div>
+                </form >
+            </div >
+        </div >
     );
 };
 
