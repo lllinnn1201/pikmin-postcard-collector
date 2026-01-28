@@ -168,7 +168,7 @@ const UploadView: React.FC = () => {
                     <div
                         onClick={triggerFileInput}
                         className={`
-              relative aspect-[4/3] w-full bg-slate-50 rounded-2xl overflow-hidden border-2 border-dashed transition-all cursor-pointer
+              relative aspect-[3/2] w-full bg-slate-50 rounded-2xl overflow-hidden border-2 border-dashed transition-all cursor-pointer
               ${previewUrl ? 'border-primary/30' : 'border-slate-200 hover:border-primary/50'}
               flex items-center justify-center group
             `}
