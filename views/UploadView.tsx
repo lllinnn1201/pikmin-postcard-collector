@@ -195,9 +195,8 @@ const UploadView: React.FC = () => {
 
                     <div className="space-y-4">
                         <div>
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">明信片標題</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">標題 (選填)</label>
                             <input
-                                required
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
@@ -208,22 +207,22 @@ const UploadView: React.FC = () => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">國家</label>
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">國家 (選填)</label>
                                 <input
                                     name="country"
                                     value={formData.country}
                                     onChange={handleChange}
-                                    placeholder="國家名稱（選填）"
+                                    placeholder="國家名稱"
                                     className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">地點</label>
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">地點 (選填)</label>
                                 <input
                                     name="location"
                                     value={formData.location}
                                     onChange={handleChange}
-                                    placeholder="地點名稱（選填）"
+                                    placeholder="地點名稱"
                                     className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                                 />
                             </div>
@@ -231,7 +230,7 @@ const UploadView: React.FC = () => {
 
                         {/* 寄送好友 */}
                         <div className="relative">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">寄送好友</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">寄送好友 (選填)</label>
                             <input
                                 name="sentTo"
                                 value={formData.sentTo}
@@ -240,7 +239,7 @@ const UploadView: React.FC = () => {
                                     setShowSuggestions(true);
                                 }}
                                 onFocus={() => setShowSuggestions(true)}
-                                placeholder="皮友名稱（選填）"
+                                placeholder="皮友名稱"
                                 className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                             />
 
