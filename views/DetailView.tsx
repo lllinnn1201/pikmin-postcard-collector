@@ -447,6 +447,21 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                         }
                         setIsSaving(false);
                         setShowSuggestions(false);
+
+                        // 強制重置 iOS Zoom
+                        if (document.activeElement instanceof HTMLElement) {
+                          document.activeElement.blur();
+                        }
+                        const viewport = document.querySelector('meta[name="viewport"]');
+                        if (viewport) {
+                          const originalContent = viewport.getAttribute('content');
+                          if (originalContent) {
+                            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0');
+                            setTimeout(() => {
+                              viewport.setAttribute('content', originalContent);
+                            }, 100);
+                          }
+                        }
                       }}
                       disabled={isSaving || !recipientName.trim()}
                       className="px-4 bg-primary text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md active:scale-95 transition-all disabled:opacity-50 flex items-center gap-1"
