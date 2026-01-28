@@ -190,7 +190,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
         <h2 className="text-lg font-extrabold leading-tight tracking-tight flex-1 text-center pr-10 text-text-main-light dark:text-white">明信片回憶</h2>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-start pt-6 pb-48 px-6 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-start pt-6 pb-80 px-6 relative z-10">
         <div className="relative group w-full max-w-sm mb-8">
           <div className="relative bg-white p-3 pb-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl transform transition-transform hover:rotate-1 hover:scale-[1.02] border border-gray-100/50">
             <div className="w-full aspect-[3/2] bg-gray-200 rounded-lg overflow-hidden relative">
@@ -385,7 +385,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                       />
 
                       {showSuggestions && suggestedFriends.length > 0 && (
-                        <div className="absolute z-[110] left-0 right-0 bottom-full mb-1 bg-white dark:bg-[#1a2e20] border border-green-800/10 dark:border-green-800/30 rounded-xl shadow-lg max-h-32 overflow-y-auto overflow-x-hidden animate-in fade-in slide-in-from-bottom-1 duration-200">
+                        <div className="absolute z-[110] left-0 right-0 top-full mt-1 bg-white dark:bg-[#1a2e20] border border-green-800/10 dark:border-green-800/30 rounded-xl shadow-lg max-h-52 overflow-y-auto overflow-x-hidden animate-in fade-in slide-in-from-top-1 duration-200">
                           {suggestedFriends.map(friend => (
                             <button
                               key={friend.id}
