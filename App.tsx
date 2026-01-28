@@ -2,7 +2,7 @@
 // 主應用程式元件
 // 包含路由邏輯與整體應用程式結構
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ViewState, Postcard } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PostcardProvider } from './contexts/PostcardContext';
@@ -30,6 +30,22 @@ const AppContent: React.FC = () => {
 
   // 選中的明信片（用於詳情頁）
   const [selectedPostcard, setSelectedPostcard] = useState<Postcard | null>(null);
+
+  // 取得滾動容器的引用
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // 當視圖切換或明信片變換時，重置捲動位置到頂部
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      // 使用 requestAnimationFrame 確保在 DOM 更新與渲染完成後執行
+      // 這可以解決視圖切換瞬間可能發生的競爭狀況
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = 0;
+        }
+      });
+    }
+  }, [currentView, selectedPostcard?.id]);
 
   // 監聽認證狀態變化，自動導向
   useEffect(() => {
@@ -101,7 +117,10 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen max-w-md mx-auto relative flex flex-col shadow-2xl overflow-hidden bg-background-light border-x border-gray-100 font-sans">
       <div className="fixed inset-0 bg-pattern pointer-events-none z-0"></div>
 
-      <main className="flex-1 z-10 overflow-y-auto no-scrollbar relative">
+      <main
+        ref={scrollContainerRef}
+        className="flex-1 z-10 overflow-y-auto no-scrollbar relative"
+      >
         {renderView()}
       </main>
 

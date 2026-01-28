@@ -23,6 +23,23 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
     setDisplayPostcard(postcard);
   }, [postcard]);
 
+  // 【補強邏輯】當詳情頁掛載時，確保捲動位置在頂部
+  // 這是為了防止 App.tsx 的全域監聽在某些邊界情況（如動畫中）失效
+  React.useEffect(() => {
+    // 延遲執行以確保元件已渲染且佈局已穩定
+    const timer = setTimeout(() => {
+      // 尋找主要的滾動容器（App.tsx 中的 <main>）並將其捲動到頂部
+      const mainContainer = document.querySelector('main');
+      if (mainContainer) {
+        mainContainer.scrollTop = 0;
+      }
+      // 同時也確保視窗本身在頂部 (雖然本應用程式使用內部滾動容器)
+      window.scrollTo(0, 0);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [postcard.id]); // 當明信片 ID 改變時切換
+
   const [recipientName, setRecipientName] = useState('');          // 收件人姓名輸入
   const [isSaving, setIsSaving] = useState(false);                  // 儲存中狀態
   const [showSuggestions, setShowSuggestions] = useState(false);    // 顯示皮友建議選單
