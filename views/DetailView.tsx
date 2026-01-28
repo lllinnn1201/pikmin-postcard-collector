@@ -300,139 +300,166 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
 
             <div className="bg-[#fcfdf6] dark:bg-[#1a2e20] border border-green-800/10 dark:border-green-800/30 rounded-2xl p-4 shadow-sm relative overflow-visible">
               <div className="space-y-3 relative z-10">
-                {displayPostcard.sentTo ? (
-                  /* 已寄送顯示 */
-                  <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/50 dark:bg-black/20 hover:bg-white transition-colors border border-transparent">
-                    <div className="flex items-center gap-3">
-                      {/* 已寄送者頭像：支援自訂頭像或縮寫 */}
-                      {(() => {
-                        const matchedFriend = friends.find(f => f.name === displayPostcard.sentTo);
-                        if (matchedFriend && isCustomAvatar(matchedFriend.avatar)) {
-                          return (
-                            <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
-                              <img src={matchedFriend.avatar} alt={displayPostcard.sentTo} className="w-full h-full object-cover" />
-                            </div>
-                          );
-                        }
-                        const avatarColor = matchedFriend ? getAvatarColor(displayPostcard.sentTo!, matchedFriend.id) : 'bg-slate-400';
-                        return (
-                          <div className={`w-10 h-10 rounded-full ${avatarColor} border-2 border-white flex items-center justify-center font-bold text-xs text-white`}>
-                            {getInitials(displayPostcard.sentTo!)}
-                          </div>
-                        );
-                      })()}
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-text-main-light dark:text-white">{displayPostcard.sentTo}</span>
-                        <span className="text-[10px] text-gray-400">已成功寄送給此皮友</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {/* 已寄送標籤 */}
-                      <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-100">
-                        <span className="text-[10px] font-bold uppercase">SENT</span>
-                        <span className="material-symbols-outlined text-[16px]">check_circle</span>
-                      </div>
-                      {/* 刪除按鈕 */}
-                      <button
-                        onClick={async () => {
-                          const { error } = await updatePostcardSentTo(postcard.id, null);
-                          if (error) {
-                            alert('刪除失敗：' + error);
-                          } else {
-                            setDisplayPostcard(prev => ({ ...prev, sentTo: undefined })); // 本地同步更新
-                          }
-                        }}
-                        className="size-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 transition-colors active:scale-95"
-                        title="刪除紀錄"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">delete</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  /* 未寄送 - 顯示輸入框 */
-                  <div className="flex flex-col gap-3">
-                    {/* 驗證錯誤訊息 */}
-                    {validationError && (
-                      <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700">
-                        <span className="material-symbols-outlined text-lg">error</span>
-                        <p className="text-xs font-medium">{validationError}</p>
-                      </div>
-                    )}
-                    <p className="text-[11px] text-gray-500 font-medium">尚未有寄送紀錄，你可以手動標註收件人：</p>
-                    <div className="flex gap-2">
-                      <div className="flex-1 relative">
-                        <input
-                          type="text"
-                          value={recipientName}
-                          onChange={(e) => {
-                            setRecipientName(e.target.value);
-                            setShowSuggestions(true);
-                            setValidationError(''); // 輸入時清除錯誤訊息
-                          }}
-                          onFocus={() => setShowSuggestions(true)}
-                          placeholder="輸入收件人姓名..."
-                          disabled={isSaving}
-                          className="w-full h-10 px-4 bg-white/80 dark:bg-black/20 border border-green-800/10 dark:border-green-800/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-medium"
-                        />
-
-                        {/* 好友建議選單 */}
-                        {showSuggestions && suggestedFriends.length > 0 && (
-                          <div className="absolute z-[110] left-0 right-0 top-full mt-1 bg-white dark:bg-[#1a2e20] border border-green-800/10 dark:border-green-800/30 rounded-xl shadow-lg max-h-32 overflow-y-auto overflow-x-hidden animate-in fade-in slide-in-from-top-1 duration-200">
-                            {suggestedFriends.map(friend => (
-                              <button
-                                key={friend.id}
-                                onClick={() => {
-                                  setRecipientName(friend.name);
-                                  setShowSuggestions(false);
-                                }}
-                                type="button" // 防止觸發 form submit
-                                className="w-full flex items-center gap-3 p-3 hover:bg-primary/10 transition-colors text-left border-b border-green-800/5 last:border-0"
-                              >
-                                {/* 統一風格縮寫頭像：優先顯示圖片 */}
-                                {isCustomAvatar(friend.avatar) ? (
-                                  <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
-                                    <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
-                                  </div>
-                                ) : (
-                                  <div className={`w-10 h-10 rounded-full ${getAvatarColor(friend.name, friend.id)} border-2 border-white flex items-center justify-center shadow-sm shrink-0`}>
-                                    <span className="text-white font-black text-xs tracking-tighter">
-                                      {getInitials(friend.name)}
-                                    </span>
-                                  </div>
-                                )}
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-bold text-text-main-light dark:text-white truncate">{friend.name}</span>
-                                  {friend.isFavorite && <span className="text-[9px] text-primary font-bold uppercase">最愛皮友</span>}
+                {/* 顯示已寄送清單 */}
+                {displayPostcard.sentTo && displayPostcard.sentTo.length > 0 && (
+                  <div className="space-y-2">
+                    {displayPostcard.sentTo.map((name, index) => (
+                      <div key={`${name}-${index}`} className="flex items-center justify-between p-2.5 rounded-xl bg-white/50 dark:bg-black/20 hover:bg-white transition-colors border border-transparent">
+                        <div className="flex items-center gap-3">
+                          {(() => {
+                            const matchedFriend = friends.find(f => f.name === name);
+                            if (matchedFriend && isCustomAvatar(matchedFriend.avatar)) {
+                              return (
+                                <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
+                                  <img src={matchedFriend.avatar} alt={name} className="w-full h-full object-cover" />
                                 </div>
-                              </button>
-                            ))}
+                              );
+                            }
+                            const avatarColor = matchedFriend ? getAvatarColor(name, matchedFriend.id) : 'bg-slate-400';
+                            return (
+                              <div className={`w-10 h-10 rounded-full ${avatarColor} border-2 border-white flex items-center justify-center font-bold text-xs text-white`}>
+                                {getInitials(name)}
+                              </div>
+                            );
+                          })()}
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-text-main-light dark:text-white">{name}</span>
+                            <span className="text-[10px] text-gray-400">已成功寄送給此皮友</span>
                           </div>
-                        )}
-
-                        {/* 點擊外部隱藏建議的透明遮罩 */}
-                        {showSuggestions && suggestedFriends.length > 0 && (
-                          <div
-                            className="fixed inset-0 z-40"
-                            onClick={() => setShowSuggestions(false)}
-                          />
-                        )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-100">
+                            <span className="text-[10px] font-bold uppercase">SENT</span>
+                            <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              const newSentTo = displayPostcard.sentTo?.filter((_, i) => i !== index) || [];
+                              const { error } = await updatePostcardSentTo(postcard.id, newSentTo.length > 0 ? newSentTo : null);
+                              if (error) {
+                                alert('刪除失敗：' + error);
+                              } else {
+                                setDisplayPostcard(prev => ({ ...prev, sentTo: newSentTo.length > 0 ? newSentTo : undefined }));
+                              }
+                            }}
+                            className="size-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 transition-colors active:scale-95"
+                            title="刪除紀錄"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        onClick={handleSaveRecipient}
-                        disabled={isSaving || !recipientName.trim()}
-                        className="px-4 bg-primary text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md active:scale-95 transition-all disabled:opacity-50 flex items-center gap-1"
-                      >
-                        {isSaving ? (
-                          <span className="animate-spin material-symbols-outlined text-sm">sync</span>
-                        ) : (
-                          <span className="material-symbols-outlined text-sm">save</span>
-                        )}
-                        儲存
-                      </button>
-                    </div>
+                    ))}
                   </div>
                 )}
+
+                {/* 輸入框區域：始終顯示或點擊 + 號顯示 */}
+                <div className="flex flex-col gap-3 pt-2">
+                  {validationError && (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700">
+                      <span className="material-symbols-outlined text-lg">error</span>
+                      <p className="text-xs font-medium">{validationError}</p>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[11px] text-gray-500 font-medium">
+                      {displayPostcard.sentTo && displayPostcard.sentTo.length > 0 ? '繼續新增收件人：' : '尚未有寄送紀錄，你可以手動標註收件人：'}
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        value={recipientName}
+                        onChange={(e) => {
+                          setRecipientName(e.target.value);
+                          setShowSuggestions(true);
+                          setValidationError('');
+                        }}
+                        onFocus={() => setShowSuggestions(true)}
+                        placeholder="輸入收件人姓名..."
+                        disabled={isSaving}
+                        className="w-full h-10 px-4 bg-white/80 dark:bg-black/20 border border-green-800/10 dark:border-green-800/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-medium"
+                      />
+
+                      {showSuggestions && suggestedFriends.length > 0 && (
+                        <div className="absolute z-[110] left-0 right-0 bottom-full mb-1 bg-white dark:bg-[#1a2e20] border border-green-800/10 dark:border-green-800/30 rounded-xl shadow-lg max-h-32 overflow-y-auto overflow-x-hidden animate-in fade-in slide-in-from-bottom-1 duration-200">
+                          {suggestedFriends.map(friend => (
+                            <button
+                              key={friend.id}
+                              onClick={() => {
+                                setRecipientName(friend.name);
+                                setShowSuggestions(false);
+                              }}
+                              type="button"
+                              className="w-full flex items-center gap-3 p-3 hover:bg-primary/10 transition-colors text-left border-b border-green-800/5 last:border-0"
+                            >
+                              {isCustomAvatar(friend.avatar) ? (
+                                <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
+                                  <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className={`w-10 h-10 rounded-full ${getAvatarColor(friend.name, friend.id)} border-2 border-white flex items-center justify-center shadow-sm shrink-0`}>
+                                  <span className="text-white font-black text-xs tracking-tighter">
+                                    {getInitials(friend.name)}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="flex flex-col">
+                                <span className="text-sm font-bold text-text-main-light dark:text-white truncate">{friend.name}</span>
+                                {friend.isFavorite && <span className="text-[9px] text-primary font-bold uppercase">最愛皮友</span>}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {showSuggestions && suggestedFriends.length > 0 && (
+                        <div className="fixed inset-0 z-40" onClick={() => setShowSuggestions(false)} />
+                      )}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setValidationError('');
+                        if (!recipientName.trim()) return;
+                        const matchedFriend = friends.find(f => f.name.toLowerCase() === recipientName.trim().toLowerCase());
+                        if (!matchedFriend) {
+                          setValidationError('此皮友尚未新增，請先至「皮友」頁面新增皮友後再寄送。');
+                          return;
+                        }
+
+                        // 檢查是否已在清單中
+                        if (displayPostcard.sentTo?.includes(matchedFriend.name)) {
+                          setValidationError('此皮友已在寄送清單中。');
+                          return;
+                        }
+
+                        setIsSaving(true);
+                        const newSentTo = [...(displayPostcard.sentTo || []), matchedFriend.name];
+                        const { error } = await updatePostcardSentTo(postcard.id, newSentTo);
+                        if (error) {
+                          alert('儲存失敗：' + error);
+                        } else {
+                          setDisplayPostcard(prev => ({ ...prev, sentTo: newSentTo }));
+                          setRecipientName(''); // 清空輸入框
+                        }
+                        setIsSaving(false);
+                        setShowSuggestions(false);
+                      }}
+                      disabled={isSaving || !recipientName.trim()}
+                      className="px-4 bg-primary text-white text-xs font-bold rounded-xl shadow-sm hover:shadow-md active:scale-95 transition-all disabled:opacity-50 flex items-center gap-1"
+                    >
+                      {isSaving ? (
+                        <span className="animate-spin material-symbols-outlined text-sm">sync</span>
+                      ) : (
+                        <span className="material-symbols-outlined text-sm">add</span>
+                      )}
+                      新增
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

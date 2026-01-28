@@ -22,9 +22,9 @@ interface PostcardContextType {
         collectedDate: string;
         category: string;
         isSpecial?: boolean;
-        sentTo?: string;
+        sentTo?: string[];
     }) => Promise<{ error: string | null }>;
-    updatePostcardSentTo: (postcardId: string, sentTo: string | null) => Promise<{ error: string | null }>;
+    updatePostcardSentTo: (postcardId: string, sentTo: string[] | null) => Promise<{ error: string | null }>;
     updatePostcard: (postcardId: string, updates: {
         title?: string;
         location?: string;
@@ -55,7 +55,7 @@ const mapRowToPostcard = (row: any, userPostcardRow?: any): Postcard => ({
     color: row.color || '#3b82f6',
     isSpecial: row.is_special || false,
     isFavorite: userPostcardRow?.is_favorite || false,
-    sentTo: userPostcardRow?.sent_to || undefined,
+    sentTo: userPostcardRow?.sent_to ? userPostcardRow.sent_to.split(',').filter((s: string) => s.trim() !== '') : undefined,
     category: row.category || '探險',
 });
 
@@ -212,7 +212,7 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     user_id: user.id,
                     postcard_id: postcardData.id,
                     collected_date: data.collectedDate,
-                    sent_to: data.sentTo || null,
+                    sent_to: data.sentTo && data.sentTo.length > 0 ? data.sentTo.join(',') : null,
                 });
 
             if (userPostcardError) throw userPostcardError;
@@ -224,7 +224,7 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     };
 
-    const updatePostcardSentTo = async (postcardId: string, sentTo: string | null) => {
+    const updatePostcardSentTo = async (postcardId: string, sentTo: string[] | null) => {
         if (!user) return { error: '請先登入' };
         setPostcards(prev =>
             prev.map(p =>
@@ -232,9 +232,10 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             )
         );
         try {
+            const sentToString = sentTo && sentTo.length > 0 ? sentTo.join(',') : null;
             const { error: updateError } = await supabase
                 .from('user_postcards')
-                .update({ sent_to: sentTo })
+                .update({ sent_to: sentToString })
                 .eq('user_id', user.id)
                 .eq('postcard_id', postcardId);
             if (updateError) throw updateError;

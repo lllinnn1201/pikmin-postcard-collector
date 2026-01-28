@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.user_postcards (
   postcard_id UUID NOT NULL REFERENCES postcards(id) ON DELETE CASCADE,
   collected_date DATE DEFAULT CURRENT_DATE, 
   is_favorite BOOLEAN DEFAULT FALSE,
-  sent_to VARCHAR(100),
+  sent_to TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(), 
   UNIQUE(user_id, postcard_id)
 );
@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS public.exchange_records (
 
 -- 6. 強制補齊欄位與修正約束 (防止舊版本缺漏)
 ALTER TABLE public.postcards ADD COLUMN IF NOT EXISTS category VARCHAR(20) DEFAULT '探險';
-ALTER TABLE public.user_postcards ADD COLUMN IF NOT EXISTS sent_to VARCHAR(100);
+ALTER TABLE public.user_postcards ADD COLUMN IF NOT EXISTS sent_to TEXT;
+ALTER TABLE public.user_postcards ALTER COLUMN sent_to TYPE TEXT;
 ALTER TABLE public.friends ALTER COLUMN friend_id DROP NOT NULL;
 ALTER TABLE public.friends ADD COLUMN IF NOT EXISTS friend_name VARCHAR(100);
 ALTER TABLE public.friends ADD COLUMN IF NOT EXISTS friend_avatar TEXT;
@@ -171,12 +172,21 @@ BEGIN
   IF (OLD.friend_name IS DISTINCT FROM NEW.friend_name) OR 
      (OLD.friend_avatar IS DISTINCT FROM NEW.friend_avatar) THEN
     
-    -- 12.1 同步更新「我的明信片」標記 (user_postcards)
+    -- 12.1 同步更新「我的明信片」標記 (user_postcards，支援逗號分隔清單)
     UPDATE public.user_postcards
-    SET sent_to = NEW.friend_name
-    WHERE user_id = NEW.user_id AND sent_to = OLD.friend_name;
+    SET sent_to = array_to_string(
+      array_replace(string_to_array(sent_to, ','), OLD.friend_name, NEW.friend_name),
+      ','
+    )
+    WHERE user_id = NEW.user_id 
+      AND (
+        sent_to = OLD.friend_name 
+        OR sent_to LIKE '%,' || OLD.friend_name || ',%' 
+        OR sent_to LIKE OLD.friend_name || ',%' 
+        OR sent_to LIKE '%,' || OLD.friend_name
+      );
     
-    -- 12.2 同步更新「寄送紀錄」(不論收件者是否已註冊)
+    -- 12.2 同步更新「寄送紀錄」(個別紀錄通常為單一收件者)
     UPDATE public.exchange_records
     SET receiver_name = NEW.friend_name
     WHERE sender_id = NEW.user_id AND receiver_name = OLD.friend_name;

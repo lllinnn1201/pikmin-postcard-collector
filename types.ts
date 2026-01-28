@@ -10,7 +10,7 @@ export interface Postcard {
   color: string;
   isSpecial?: boolean;
   isFavorite?: boolean;
-  sentTo?: string; // 寄送對象名稱
+  sentTo?: string[]; // 寄送對象名稱列表
   category: string; // 分類（蘑菇、探險、花瓣）
 }
 
