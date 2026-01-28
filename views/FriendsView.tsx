@@ -304,7 +304,7 @@ const FriendsView: React.FC = () => {
 
             {/* 刪除確認對話框 */}
             {friendToDelete && (
-                <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center pb-[10vh]">
                     {/* 背景遮罩 */}
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -351,7 +351,7 @@ const FriendsView: React.FC = () => {
 
             {/* 編輯皮友對話框 */}
             {friendToEdit && (
-                <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
+                <div className="fixed inset-0 z-50 flex items-center justify-center pb-[10vh]">
                     {/* 背景遮罩 */}
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
