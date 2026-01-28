@@ -206,7 +206,7 @@ const RecordsView: React.FC = () => {
           {filteredRecords.map((group) => (
             <div key={group.friendId} className="flex flex-col gap-4">
               {/* 皮友資訊區 - 固定在上方 */}
-              <div className="flex items-center gap-3 px-1">
+              <div className="flex items-center gap-3 px-4">
                 {/* 皮友頭像 - 使用純色背景 + 縮寫文字（與 FriendsView 一致） */}
                 {isCustomAvatar(group.friendAvatar) ? (
                   // 自訂頭像：顯示上傳的圖片
@@ -236,7 +236,12 @@ const RecordsView: React.FC = () => {
 
               {/* 明信片水平捲動清單（如果有明信片才顯示） */}
               {group.postcards.length > 0 ? (
-                <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 px-4 pb-4 snap-x snap-mandatory">
+                <div
+                  className="flex gap-4 overflow-x-auto no-scrollbar -mx-4 pb-4 snap-x snap-mandatory"
+                >
+                  {/* 左側間距元件 (16px gap + 16px spacer = 32px) */}
+                  <div className="flex-none w-4 snap-start" aria-hidden="true" />
+
                   {group.postcards.map((postcard) => (
                     <div
                       key={postcard.id}
@@ -269,6 +274,8 @@ const RecordsView: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  {/* 右側間距元件 (16px gap + 16px spacer = 32px) */}
+                  <div className="flex-none w-4 snap-end" aria-hidden="true" />
                 </div>
               ) : (
                 // 沒有明信片時顯示「尚未寄送」提示
