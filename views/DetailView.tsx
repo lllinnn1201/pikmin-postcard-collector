@@ -364,7 +364,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
 
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-[11px] text-gray-500 font-medium">
-                      {displayPostcard.sentTo && displayPostcard.sentTo.length > 0 ? '繼續新增收件人：' : '尚未有寄送紀錄，你可以手動標註收件人：'}
+                      {displayPostcard.sentTo && displayPostcard.sentTo.length > 0 ? '新增皮友：' : '新增皮友：'}
                     </p>
                   </div>
 
@@ -379,7 +379,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                           setValidationError('');
                         }}
                         onFocus={() => setShowSuggestions(true)}
-                        placeholder="輸入收件人姓名..."
+                        placeholder="輸入皮友名稱..."
                         disabled={isSaving}
                         className="w-full h-10 px-4 bg-white/80 dark:bg-black/20 border border-green-800/10 dark:border-green-800/30 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all font-medium"
                       />
