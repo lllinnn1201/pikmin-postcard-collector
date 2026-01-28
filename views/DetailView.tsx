@@ -342,10 +342,10 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                                 setDisplayPostcard(prev => ({ ...prev, sentTo: newSentTo.length > 0 ? newSentTo : undefined }));
                               }
                             }}
-                            className="size-8 flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-500 border border-red-100 transition-colors active:scale-95"
+                            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-300 hover:bg-red-50 hover:text-red-500 transition-all active:scale-95"
                             title="刪除紀錄"
                           >
-                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                            <span className="material-symbols-outlined text-[20px]">delete</span>
                           </button>
                         </div>
                       </div>

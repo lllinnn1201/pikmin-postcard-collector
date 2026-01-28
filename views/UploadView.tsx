@@ -16,6 +16,8 @@ const UploadView: React.FC = () => {
     // 好友相關狀態
     const { friends } = useFriends();
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(''); // 搜尋關鍵字
+    const [selectedFriends, setSelectedFriends] = useState<string[]>([]); // 已選擇的皮友
 
     const [formData, setFormData] = useState({
         title: '',
@@ -25,7 +27,6 @@ const UploadView: React.FC = () => {
         description: '',
         color: '#ed6c00',
         collectedDate: new Date().toISOString().split('T')[0],
-        sentTo: '', // 新增：寄送給哪位皮友
     });
 
     // 處理檔案選擇
@@ -64,19 +65,15 @@ const UploadView: React.FC = () => {
             if (!uploadResult.data) throw new Error('圖片上傳失敗，未取得網址');
 
             // 2. 驗證好友是否存在 (若有填寫)
-            if (formData.sentTo.trim()) {
-                const matchedFriend = friends.find(f => f.name.toLowerCase() === formData.sentTo.trim().toLowerCase());
-                if (!matchedFriend) {
-                    throw new Error('此皮友尚未新增，請先至「皮友」頁面新增皮友後再寄送。');
-                }
-            }
+            // 這裡已經透過選單選擇，理論上都是存在的，但若有手動輸入可能需要額外檢查
+            // 不過本邏輯改為只能透過選單加入，因此略過
 
             // 3. 儲存明信片資料
             const result = await addPostcard({
                 ...formData,
                 imageUrl: uploadResult.data,
                 isSpecial: formData.category === '花瓣', // 如果是花瓣，則設為特殊
-                sentTo: formData.sentTo.trim() ? [formData.sentTo.trim()] : undefined, // 新增：存入寄送者
+                sentTo: selectedFriends.length > 0 ? selectedFriends : undefined, // 存入多位寄送者
                 description: `${formData.category} - ${formData.description}` // 將分類存入描述開頭
             });
 
@@ -93,8 +90,9 @@ const UploadView: React.FC = () => {
                     description: '',
                     color: '#ed6c00',
                     collectedDate: new Date().toISOString().split('T')[0],
-                    sentTo: '',
                 });
+                setSelectedFriends([]);
+                setSearchTerm('');
                 setSelectedFile(null);
                 setPreviewUrl(null);
             }
@@ -108,6 +106,20 @@ const UploadView: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // 加入好友到選擇列表
+    const addFriend = (name: string) => {
+        if (!selectedFriends.includes(name)) {
+            setSelectedFriends(prev => [...prev, name]);
+        }
+        setSearchTerm('');
+        setShowSuggestions(false);
+    };
+
+    // 從選擇列表移除好友
+    const removeFriend = (name: string) => {
+        setSelectedFriends(prev => prev.filter(n => n !== name));
     };
 
     // --- 好友頭像同步邏輯 (與 DetailView 一致) ---
@@ -230,30 +242,68 @@ const UploadView: React.FC = () => {
 
                         <div className="relative">
                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">寄送皮友 (選填)</label>
+
+                            {/* 已選擇的皮友列表 */}
+                            {selectedFriends.length > 0 && (
+                                <div className="space-y-3 mb-4">
+                                    {selectedFriends.map(name => {
+                                        const friend = friends.find(f => f.name === name);
+                                        const initials = friend ? getInitials(friend.name) : name.slice(0, 2).toUpperCase();
+                                        const avatarColor = friend ? getAvatarColor(friend.name, friend.id) : 'bg-gray-400';
+
+                                        return (
+                                            <div key={name} className="flex items-center justify-between p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                                                <div className="flex items-center gap-3">
+                                                    {friend && isCustomAvatar(friend.avatar) ? (
+                                                        <div className="w-12 h-12 rounded-full border-2 border-slate-50 shadow-sm overflow-hidden shrink-0">
+                                                            <img src={friend.avatar} alt={friend.name} className="w-full h-full object-cover" />
+                                                        </div>
+                                                    ) : (
+                                                        <div className={`w-12 h-12 rounded-full ${avatarColor} border-2 border-white flex items-center justify-center shadow-sm shrink-0`}>
+                                                            <span className="text-white font-black text-sm tracking-tighter">
+                                                                {initials}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <h3 className="font-bold text-slate-700 text-sm">{name}</h3>
+                                                        <p className="text-xs text-primary font-bold mt-0.5">預計寄送</p>
+                                                    </div>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeFriend(name)}
+                                                    className="w-10 h-10 flex items-center justify-center rounded-full text-slate-200 hover:bg-red-50 hover:text-red-500 transition-all active:scale-95"
+                                                >
+                                                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
                             <input
-                                name="sentTo"
-                                value={formData.sentTo}
+                                value={searchTerm}
                                 onChange={(e) => {
-                                    handleChange(e);
+                                    setSearchTerm(e.target.value);
                                     setShowSuggestions(true);
                                 }}
                                 onFocus={() => setShowSuggestions(true)}
-                                placeholder="皮友名稱"
+                                placeholder={selectedFriends.length > 0 ? "新增皮友名稱" : "皮友名稱"}
                                 className="w-full px-4 py-3.5 bg-slate-50 border-none rounded-2xl text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all font-bold"
                             />
 
                             {/* 好友建議選單 */}
-                            {showSuggestions && formData.sentTo && friends.filter(f => f.name.toLowerCase().includes(formData.sentTo.toLowerCase())).length > 0 && (
+                            {showSuggestions && searchTerm && friends.filter(f => f.name.toLowerCase().includes(searchTerm.toLowerCase()) && !selectedFriends.includes(f.name)).length > 0 && (
                                 <div className="absolute z-[110] left-0 right-0 top-full mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl max-h-48 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-200">
                                     {friends
-                                        .filter(f => f.name.toLowerCase().includes(formData.sentTo.toLowerCase()))
+                                        .filter(f => f.name.toLowerCase().includes(searchTerm.toLowerCase()) && !selectedFriends.includes(f.name))
                                         .map(friend => (
                                             <div
                                                 key={friend.id}
-                                                onClick={() => {
-                                                    setFormData(prev => ({ ...prev, sentTo: friend.name }));
-                                                    setShowSuggestions(false);
-                                                }}
+                                                onClick={() => addFriend(friend.name)}
                                                 className="flex items-center gap-3 p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0"
                                             >
                                                 {isCustomAvatar(friend.avatar) ? (
