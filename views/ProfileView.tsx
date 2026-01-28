@@ -41,10 +41,6 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onLogout }) => {
   const displayProfile = profile || {
     username: "新使用者",
     avatarUrl: 'https://ui-avatars.com/api/?name=User&background=random',
-    level: 1,
-    title: '皮克敏收藏家',
-    totalPostcards: 0,
-    totalDistanceKm: 0,
   };
 
   return (
@@ -130,27 +126,17 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onLogout }) => {
           <h2 className="text-2xl font-black text-text-main-light dark:text-white tracking-tight">
             {loading ? '載入中...' : displayProfile.username}
           </h2>
-          <p className="text-primary font-bold">
-            等級 {displayProfile.level} • {displayProfile.title}
-          </p>
         </div>
       </header>
 
       {/* 統計資料區 */}
-      <div className="px-6 grid grid-cols-2 gap-4 mb-8">
+      <div className="px-6 mb-8">
         {/* 明信片數量 */}
-        <div className="bg-white dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
-          <span className="text-3xl font-black text-primary">
-            {postcardCount > 0 ? postcardCount : displayProfile.totalPostcards}
+        <div className="bg-white dark:bg-surface-dark p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center">
+          <span className="text-4xl font-black text-primary">
+            {postcardCount}
           </span>
-          <p className="text-xs font-bold text-text-sec-light uppercase tracking-wider mt-1">收集明信片</p>
-        </div>
-        {/* 步行距離 */}
-        <div className="bg-white dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
-          <span className="text-3xl font-black text-accent">
-            {displayProfile.totalDistanceKm.toLocaleString()}
-          </span>
-          <p className="text-xs font-bold text-text-sec-light uppercase tracking-wider mt-1">步行總數 (KM)</p>
+          <p className="text-sm font-bold text-text-sec-light uppercase tracking-wider mt-2">收集明信片總數</p>
         </div>
       </div>
 

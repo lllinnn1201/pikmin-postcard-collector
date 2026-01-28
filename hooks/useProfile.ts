@@ -10,10 +10,6 @@ export interface Profile {
     id: string;
     username: string;
     avatarUrl: string;
-    level: number;
-    title: string;
-    totalPostcards: number;
-    totalDistanceKm: number;
 }
 
 // 從資料庫行轉換為前端 Profile 型別
@@ -21,10 +17,6 @@ const mapRowToProfile = (row: any): Profile => ({
     id: row.id,
     username: row.username || '未命名使用者',
     avatarUrl: row.avatar || 'https://via.placeholder.com/100',
-    level: row.level || 1,
-    title: row.title || '新手探險家',
-    totalPostcards: row.total_postcards || 0,
-    totalDistanceKm: row.total_distance_km || 0,
 });
 
 export const useProfile = () => {

@@ -9,10 +9,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   username TEXT,  -- 改用 TEXT 避免長度限制
   avatar_url TEXT,  -- 修正為 avatar_url
-  level INTEGER DEFAULT 1,
-  title TEXT DEFAULT '新手探險家',
-  total_postcards INTEGER DEFAULT 0,
-  total_distance_km DECIMAL(10,2) DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

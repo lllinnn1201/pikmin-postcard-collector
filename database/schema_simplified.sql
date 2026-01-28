@@ -1,6 +1,6 @@
 -- =====================================================
 -- 皮克敏明信片收藏館 - 最終整合腳本 (資料庫 + 儲存空間)
--- 支援「帳號名稱」登入與自動 Profile 建立
+-- 移除多餘欄位版本 (level, title, postcards_count, distance)
 -- =====================================================
 
 -- 1. 建立/更新基礎資料表 (Profiles)
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.user_postcards (
   postcard_id UUID NOT NULL REFERENCES postcards(id) ON DELETE CASCADE,
   collected_date DATE DEFAULT CURRENT_DATE, 
   is_favorite BOOLEAN DEFAULT FALSE,
-  sent_to TEXT,
+  sent_to TEXT, -- 支援儲存多位收件人（以逗號分隔）
   created_at TIMESTAMPTZ DEFAULT NOW(), 
   UNIQUE(user_id, postcard_id)
 );
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS public.exchange_records (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. 強制補齊欄位與修正約束 (防止舊版本缺漏)
+-- 6. 強制補齊欄位與修正規格 (安全性 ALTER 語句)
 ALTER TABLE public.postcards ADD COLUMN IF NOT EXISTS category VARCHAR(20) DEFAULT '探險';
 ALTER TABLE public.user_postcards ADD COLUMN IF NOT EXISTS sent_to TEXT;
 ALTER TABLE public.user_postcards ALTER COLUMN sent_to TYPE TEXT;
@@ -88,47 +88,41 @@ ALTER TABLE public.friends ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exchange_records ENABLE ROW LEVEL SECURITY;
 
 -- 9. 設定資料表安全政策 (RLS Policies)
--- Profiles: 所有人可見，本人可改
+-- Profiles
 DROP POLICY IF EXISTS "所有人可讀取 profiles" ON public.profiles;
 CREATE POLICY "所有人可讀取 profiles" ON public.profiles FOR SELECT USING (true);
 DROP POLICY IF EXISTS "使用者可更新自己的 profile" ON public.profiles;
 CREATE POLICY "使用者可更新自己的 profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
--- Postcards: 所有人可讀，所有人可新增 (自定義明信片)
+-- Postcards
 DROP POLICY IF EXISTS "所有人可讀取 postcards" ON public.postcards;
 CREATE POLICY "所有人可讀取 postcards" ON public.postcards FOR SELECT USING (true);
 DROP POLICY IF EXISTS "登入使用者可新增 postcards" ON public.postcards;
 CREATE POLICY "登入使用者可新增 postcards" ON public.postcards FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-
--- Postcards: 允許使用者刪除自己的明信片
 DROP POLICY IF EXISTS "使用者可刪除自己的 postcards" ON public.postcards;
 CREATE POLICY "使用者可刪除自己的 postcards" ON public.postcards FOR DELETE USING (
   id IN (SELECT postcard_id FROM public.user_postcards WHERE user_id = auth.uid())
 );
-
--- Postcards: 允許使用者更新自己的明信片
 DROP POLICY IF EXISTS "使用者可更新自己的 postcards" ON public.postcards;
 CREATE POLICY "使用者可更新自己的 postcards" ON public.postcards FOR UPDATE USING (
   id IN (SELECT postcard_id FROM public.user_postcards WHERE user_id = auth.uid())
 );
 
--- User Postcards & Friends: 僅限本人操作
+-- User Postcards & Friends
 DROP POLICY IF EXISTS "使用者可操作自己的 user_postcards" ON public.user_postcards;
 CREATE POLICY "使用者可操作自己的 user_postcards" ON public.user_postcards FOR ALL USING (auth.uid() = user_id);
 DROP POLICY IF EXISTS "使用者可操作自己的 friends" ON public.friends;
 CREATE POLICY "使用者可操作自己的 friends" ON public.friends FOR ALL USING (auth.uid() = user_id);
 
--- Exchange Records: 寄件者與收件者可見
+-- Exchange Records
 DROP POLICY IF EXISTS "使用者可操作自己的 exchange_records" ON public.exchange_records;
 CREATE POLICY "使用者可操作自己的 exchange_records" ON public.exchange_records FOR ALL USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
 
 -- 10. 設定儲存空間安全政策 (Storage Policies)
--- 皮友頭像 (friend-avatars)
 DROP POLICY IF EXISTS "所有人可讀取皮友頭像" ON storage.objects;
 CREATE POLICY "所有人可讀取皮友頭像" ON storage.objects FOR SELECT USING (bucket_id = 'friend-avatars');
 DROP POLICY IF EXISTS "使用者可管理自己的皮友頭像" ON storage.objects;
 CREATE POLICY "使用者可管理自己的皮友頭像" ON storage.objects FOR ALL USING (bucket_id = 'friend-avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
--- 明信片圖片 (postcards)
 DROP POLICY IF EXISTS "所有人可讀取明信片圖片" ON storage.objects;
 CREATE POLICY "所有人可讀取明信片圖片" ON storage.objects FOR SELECT USING (bucket_id = 'postcards');
 DROP POLICY IF EXISTS "使用者可管理自己的明信片圖片" ON storage.objects;
@@ -160,15 +154,13 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- 12. 皮友資訊同步觸發器 (同步更新 user_postcards 與 exchange_records)
+-- 12. 皮友資訊同步觸發器
 CREATE OR REPLACE FUNCTION public.sync_friend_info_update()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- 當名稱或頭像發生變更時進行同步
   IF (OLD.friend_name IS DISTINCT FROM NEW.friend_name) OR 
      (OLD.friend_avatar IS DISTINCT FROM NEW.friend_avatar) THEN
     
-    -- 12.1 同步更新「我的明信片」標記 (user_postcards，支援逗號分隔清單)
     UPDATE public.user_postcards
     SET sent_to = array_to_string(
       array_replace(string_to_array(sent_to, ','), OLD.friend_name, NEW.friend_name),
@@ -177,12 +169,11 @@ BEGIN
     WHERE user_id = NEW.user_id 
       AND (
         sent_to = OLD.friend_name 
-        OR sent_to LIKE '%,' || OLD.friend_name || ',%' 
+        OR sent_to LIKE '%處理,' || OLD.friend_name || ',%' 
         OR sent_to LIKE OLD.friend_name || ',%' 
         OR sent_to LIKE '%,' || OLD.friend_name
       );
     
-    -- 12.2 同步更新「寄送紀錄」(個別紀錄通常為單一收件者)
     UPDATE public.exchange_records
     SET receiver_name = NEW.friend_name
     WHERE sender_id = NEW.user_id AND receiver_name = OLD.friend_name;
@@ -192,10 +183,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 掛載同步觸發器
-DROP TRIGGER IF EXISTS on_friend_name_updated ON public.friends;
 DROP TRIGGER IF EXISTS on_friend_info_updated ON public.friends;
-
 CREATE TRIGGER on_friend_info_updated
   AFTER UPDATE OF friend_name, friend_avatar ON public.friends
   FOR EACH ROW EXECUTE FUNCTION public.sync_friend_info_update();
