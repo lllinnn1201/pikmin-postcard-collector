@@ -126,7 +126,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
     }
     // 開始儲存流程
     setIsSaving(true);
-    const { error } = await updatePostcardSentTo(postcard.id, recipientName.trim());
+    const { error } = await updatePostcardSentTo(postcard.id, [recipientName.trim()]);
     if (error) {
       alert('儲存失敗：' + error);
     } else {

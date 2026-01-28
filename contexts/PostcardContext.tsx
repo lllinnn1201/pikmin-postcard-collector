@@ -212,7 +212,9 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     user_id: user.id,
                     postcard_id: postcardData.id,
                     collected_date: data.collectedDate,
-                    sent_to: data.sentTo && data.sentTo.length > 0 ? data.sentTo.join(',') : null,
+                    sent_to: Array.isArray(data.sentTo) && data.sentTo.length > 0
+                        ? data.sentTo.join(',')
+                        : (typeof data.sentTo === 'string' ? data.sentTo : null),
                 });
 
             if (userPostcardError) throw userPostcardError;
@@ -232,7 +234,9 @@ export const PostcardProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             )
         );
         try {
-            const sentToString = sentTo && sentTo.length > 0 ? sentTo.join(',') : null;
+            const sentToString = Array.isArray(sentTo) && sentTo.length > 0
+                ? sentTo.join(',')
+                : (typeof sentTo === 'string' ? sentTo : null);
             const { error: updateError } = await supabase
                 .from('user_postcards')
                 .update({ sent_to: sentToString })
