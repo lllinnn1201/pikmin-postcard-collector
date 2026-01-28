@@ -151,7 +151,7 @@ const RecordsView: React.FC = () => {
             <span className="material-symbols-outlined text-[22px]">search</span>
           </div>
           <input
-            className="w-full h-full bg-transparent border-none pl-12 pr-4 text-base font-bold placeholder-text-sec-light/50 focus:ring-0 focus:outline-none text-slate-700"
+            className="w-full h-full bg-transparent border-none pl-12 pr-4 text-sm font-bold placeholder-slate-400 focus:ring-0 focus:outline-none"
             placeholder="搜尋皮友名稱..."
             type="text"
             value={searchTerm}

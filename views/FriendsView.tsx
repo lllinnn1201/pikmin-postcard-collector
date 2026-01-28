@@ -148,7 +148,7 @@ const FriendsView: React.FC = () => {
                         <span className="material-symbols-outlined text-[22px]">search</span>
                     </div>
                     <input
-                        className="w-full h-full bg-transparent border-none pl-12 pr-4 text-base font-bold placeholder-text-sec-light/50 focus:ring-0 focus:outline-none text-slate-700"
+                        className="w-full h-full bg-transparent border-none pl-12 pr-4 text-sm font-bold placeholder-slate-400 focus:ring-0 focus:outline-none"
                         placeholder="搜尋皮友名稱..."
                         type="text"
                         value={searchTerm}
@@ -304,7 +304,7 @@ const FriendsView: React.FC = () => {
 
             {/* 刪除確認對話框 */}
             {friendToDelete && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
                     {/* 背景遮罩 */}
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -351,7 +351,7 @@ const FriendsView: React.FC = () => {
 
             {/* 編輯皮友對話框 */}
             {friendToEdit && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
                     {/* 背景遮罩 */}
                     <div
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
