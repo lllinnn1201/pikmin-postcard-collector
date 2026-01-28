@@ -111,22 +111,27 @@ export const useExchangeRecords = () => {
                 mapRowToExchangeRecord(row, user.id)
             );
 
-            // 轉換手動標註紀錄為 ExchangeRecord 格式
-            const manualRecords: ExchangeRecord[] = (manualData || []).map((row: any) => ({
-                id: row.id,
-                friendId: row.sent_to, // 使用名稱作為虛擬 ID，與皮友列表同步
-                friendName: row.sent_to,
-                friendAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(row.sent_to)}&background=7dd3fc&color=fff&bold=true`, // 使用簡潔的縮寫頭像
-                date: new Date(row.collected_date).toLocaleDateString('zh-TW', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }),
-                postcardTitle: row.postcards.title,
-                postcardImageUrl: row.postcards.image_url,
-                type: 'sent',
-                status: 'delivered',
-            }));
+            // 轉換手動標註紀錄為 ExchangeRecord 格式 (支援多收件人)
+            const manualRecords: ExchangeRecord[] = (manualData || []).flatMap((row: any) => {
+                const recipients = (row.sent_to || '').split(',').map((s: string) => s.trim()).filter((s: string) => s !== '');
+
+                return recipients.map((recipient: string, index: number) => ({
+                    id: `${row.id}-${index}`, // 確保 ID 唯一
+                    friendId: recipient, // 使用名稱作為虛擬 ID，與皮友列表同步
+                    friendName: recipient,
+                    friendAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(recipient)}&background=7dd3fc&color=fff&bold=true`,
+                    date: new Date(row.collected_date).toLocaleDateString('zh-TW', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }),
+                    postcardTitle: row.postcards.title,
+                    postcardImageUrl: row.postcards.image_url,
+                    type: 'sent',
+                    status: 'delivered',
+                }));
+            });
+
 
             // 合併並排序
             setRecords([...formalRecords, ...manualRecords].sort((a, b) =>
