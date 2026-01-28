@@ -113,7 +113,7 @@ const CollectionView: React.FC<CollectionViewProps> = ({
 
   // 分類選項
   // 分類選項：全部、我的最愛、蘑菇、探險、花瓣
-  const categories = ['全部', '我的最愛', '蘑菇', '探險', '花瓣'];
+  const categories = ['全部', '我的最愛', '蘑菇', '探險', '花瓣', '快照'];
 
   return (
     <div className="flex flex-col h-full min-h-screen">

@@ -347,7 +347,7 @@ const UploadView: React.FC = () => {
                         <div>
                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block px-1">分類</label>
                             <div className="flex gap-4 px-1">
-                                {['蘑菇', '探險', '花瓣'].map((cat) => (
+                                {['蘑菇', '探險', '花瓣', '快照'].map((cat) => (
                                     <div
                                         key={cat}
                                         onClick={() => setFormData(prev => ({ ...prev, category: cat }))}
