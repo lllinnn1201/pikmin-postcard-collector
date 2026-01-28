@@ -15,6 +15,7 @@ import RecordsView from './views/RecordsView';
 import UploadView from './views/UploadView';
 import FriendsView from './views/FriendsView';
 import BottomNav from './components/BottomNav';
+import Loading from './components/Loading';
 
 // 主要應用程式內容（需在 AuthProvider 內部使用）
 const AppContent: React.FC = () => {
@@ -51,23 +52,9 @@ const AppContent: React.FC = () => {
   };
 
   // 顯示載入中畫面
-  // 或：使用者已登入但尚未導向（避免閃現登入畫面）
+  // 只有在認證狀態載入中，或是「已登入但尚未導向」的極短暫間隙顯示全域載入
   if (loading || (user && currentView === 'login')) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background-light">
-        <div className="flex flex-col items-center gap-4">
-          <svg
-            className="w-16 h-16 text-primary animate-pulse"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M12 2C9.79 2 8 3.79 8 6s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm4 8c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4zm8 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" />
-          </svg>
-          <p className="text-text-sec-light font-medium">載入中...</p>
-        </div>
-      </div>
-    );
+    return <Loading fullScreen message="確認身分中..." />;
   }
 
   // 渲染當前視圖

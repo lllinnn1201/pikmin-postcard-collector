@@ -5,7 +5,8 @@
 import React, { useState } from 'react';
 import { Postcard } from '../types';
 import { usePostcards } from '../hooks/usePostcards';
-import { MOCK_POSTCARDS } from '../constants';
+import { PostcardSkeleton } from '../components/Skeleton';
+import Loading from '../components/Loading';
 
 // 明信片元件的 props 介面
 interface CollectionViewProps {
@@ -129,7 +130,7 @@ const CollectionView: React.FC<CollectionViewProps> = ({
             <span className="material-symbols-outlined text-[22px]">search</span>
           </div>
           <input
-            className="w-full h-full bg-transparent border-none pl-12 pr-4 text-base font-bold placeholder-text-sec-light/50 focus:ring-0 focus:outline-none dark:text-white"
+            className="w-full h-full bg-transparent border-none pl-12 pr-4 text-sm font-bold placeholder-slate-400 focus:ring-0 focus:outline-none dark:text-white"
             placeholder="搜尋標題、國家、地點..."
             type="text"
             value={searchTerm}
@@ -156,13 +157,12 @@ const CollectionView: React.FC<CollectionViewProps> = ({
         </div>
       </div>
 
-      {/* 載入中狀態 */}
+      {/* 載入中狀態 - 使用 Skeleton Screen */}
       {loading && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-3">
-            <span className="material-symbols-outlined text-4xl text-primary animate-pulse">mail</span>
-            <p className="text-text-sec-light font-medium">載入明信片中...</p>
-          </div>
+        <div className="px-4 pt-2 grid grid-cols-2 gap-4 pb-28">
+          {[...Array(6)].map((_, i) => (
+            <PostcardSkeleton key={i} />
+          ))}
         </div>
       )}
 
