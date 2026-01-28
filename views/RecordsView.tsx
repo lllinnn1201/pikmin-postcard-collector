@@ -141,7 +141,7 @@ const RecordsView: React.FC = () => {
       {/* 頁面標題區 */}
       <header className="mb-6">
         <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">寄送紀錄</h1>
-        <p className="text-sm text-slate-400">查看每位好友收過的明信片，避免重複寄送</p>
+        <p className="text-sm text-slate-400">查看每位皮友收過的明信片，避免重複寄送</p>
       </header>
 
       {/* 搜尋欄 - 與其他頁面樣式一致 */}
@@ -152,7 +152,7 @@ const RecordsView: React.FC = () => {
           </div>
           <input
             className="w-full h-full bg-transparent border-none pl-12 pr-4 text-base font-bold placeholder-text-sec-light/50 focus:ring-0 focus:outline-none text-slate-700"
-            placeholder="搜尋好友名稱..."
+            placeholder="搜尋皮友名稱..."
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -177,7 +177,7 @@ const RecordsView: React.FC = () => {
         </div>
       )}
 
-      {/* 好友紀錄列表 */}
+      {/* 皮友紀錄列表 */}
       {!loading && (
         <div className="space-y-10">
           {/* 分類標籤 */}
@@ -205,9 +205,9 @@ const RecordsView: React.FC = () => {
 
           {filteredRecords.map((group) => (
             <div key={group.friendId} className="flex flex-col gap-4">
-              {/* 好友資訊區 - 固定在上方 */}
+              {/* 皮友資訊區 - 固定在上方 */}
               <div className="flex items-center gap-3 px-1">
-                {/* 好友頭像 - 使用純色背景 + 縮寫文字（與 FriendsView 一致） */}
+                {/* 皮友頭像 - 使用純色背景 + 縮寫文字（與 FriendsView 一致） */}
                 {isCustomAvatar(group.friendAvatar) ? (
                   // 自訂頭像：顯示上傳的圖片
                   <div className="w-[42px] h-[42px] rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0">
@@ -225,7 +225,7 @@ const RecordsView: React.FC = () => {
                     </span>
                   </div>
                 )}
-                {/* 好友名稱與統計 */}
+                {/* 皮友名稱與統計 */}
                 <div className="flex-1">
                   <h3 className="text-lg font-black text-slate-800 tracking-tight leading-tight">{group.friendName}</h3>
                   <p className="text-xs font-medium text-slate-400">
@@ -274,7 +274,7 @@ const RecordsView: React.FC = () => {
                 // 沒有明信片時顯示「尚未寄送」提示
                 <div className="flex items-center gap-3 py-3 px-4 bg-white/50 rounded-2xl border border-dashed border-slate-200">
                   <span className="material-symbols-outlined text-slate-300 text-xl">mail</span>
-                  <p className="text-sm text-slate-400">尚未寄送任何明信片給這位好友</p>
+                  <p className="text-sm text-slate-400">尚未寄送任何明信片給這位皮友</p>
                 </div>
               )}
             </div>
@@ -287,7 +287,7 @@ const RecordsView: React.FC = () => {
                 <span className="material-symbols-outlined text-[40px] text-slate-200">search</span>
               </div>
               <p className="text-slate-400 text-lg font-black tracking-tight">{searchTerm ? '找不到相關紀錄' : '還沒有寄送紀錄'}</p>
-              <p className="text-sm text-slate-300 mt-1">{searchTerm ? '請嘗試不同的搜尋關鍵字' : '開始分享明信片給好友吧！'}</p>
+              <p className="text-sm text-slate-300 mt-1">{searchTerm ? '請嘗試不同的搜尋關鍵字' : '開始分享明信片給皮友吧！'}</p>
             </div>
           )}
         </div>

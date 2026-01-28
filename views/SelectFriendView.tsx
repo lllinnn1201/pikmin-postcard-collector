@@ -1,6 +1,6 @@
 
-// 選擇好友視圖元件
-// 選擇要寄送明信片的好友
+// 選擇皮友視圖元件
+// 選擇要寄送明信片的皮友
 
 import React from 'react';
 import { useFriends } from '../hooks/useFriends';
@@ -13,7 +13,7 @@ interface SelectFriendViewProps {
 }
 
 const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) => {
-  // 從 hook 取得好友資料
+  // 從 hook 取得皮友資料
   const { friends: apiFriends, loading, error } = useFriends();
 
   // 如果 API 尚未返回資料，使用 Mock 資料作為備援
@@ -42,7 +42,7 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
     return a.localeCompare(b, 'zh-Hant-TW', { sensitivity: 'base' });
   };
 
-  // 排序後的好友列表
+  // 排序後的皮友列表
   const sortedFriends = [...friends].sort((a, b) => compareName(a.name, b.name));
 
   return (
@@ -58,7 +58,7 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
             <span className="material-symbols-outlined text-2xl">arrow_back</span>
           </button>
           {/* 標題 */}
-          <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">選擇寄送好友</h2>
+          <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">選擇寄送皮友</h2>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
           <div className="flex items-center justify-center py-8">
             <div className="flex flex-col items-center gap-3">
               <span className="material-symbols-outlined text-3xl text-primary animate-pulse">group</span>
-              <p className="text-text-sec-light text-sm">載入好友列表中...</p>
+              <p className="text-text-sec-light text-sm">載入皮友列表中...</p>
             </div>
           </div>
         )}
@@ -112,7 +112,7 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
           </div>
         )}
 
-        {/* 好友列表 */}
+        {/* 皮友列表 */}
         {!loading && (
           <div className="flex flex-col gap-4">
             {sortedFriends.map((friend) => (
@@ -120,10 +120,10 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
                 key={friend.id}
                 className="group bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/5 transition-all hover:shadow-md"
               >
-                {/* 好友資訊區 */}
+                {/* 皮友資訊區 */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="flex items-center gap-3">
-                    {/* 好友頭像 */}
+                    {/* 皮友頭像 */}
                     <div className="relative">
                       <div
                         className="bg-center bg-no-repeat bg-cover rounded-full h-12 w-12 border-2 border-primary"
@@ -131,7 +131,7 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
                       />
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-white dark:border-surface-dark"></div>
                     </div>
-                    {/* 好友名稱 */}
+                    {/* 皮友名稱 */}
                     <div>
                       <h3 className="text-text-main-light dark:text-white text-base font-bold leading-tight">{friend.name}</h3>
                       <p className="text-text-sec-light dark:text-text-sec-dark text-xs font-medium">{friend.lastActive}</p>
@@ -178,11 +178,11 @@ const SelectFriendView: React.FC<SelectFriendViewProps> = ({ onBack, onSent }) =
 
         {/* 列表結尾 */}
         <div className="flex items-center justify-center py-6">
-          <p className="text-text-sec-light text-sm">這就是你的所有好友了！</p>
+          <p className="text-text-sec-light text-sm">這就是你的所有皮友了！</p>
         </div>
       </main>
 
-      {/* 新增好友按鈕 */}
+      {/* 新增皮友按鈕 */}
       <button className="fixed bottom-6 right-6 h-14 w-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40">
         <span className="material-symbols-outlined text-2xl">person_add</span>
       </button>

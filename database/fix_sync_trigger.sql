@@ -1,5 +1,5 @@
 -- =====================================================
--- 皮克敏明信片收藏館 - 好友名稱與頭像同步修飾腳本
+-- 皮克敏明信片收藏館 - 皮友名稱與頭像同步修飾腳本
 -- 1. 支援同步更新 friend_name 與 friend_avatar
 -- 2. 放寬 exchange_records 同步條件 (不論收件者是否已註冊)
 -- =====================================================
@@ -18,7 +18,7 @@ BEGIN
     
     -- 2. 同步更新交換紀錄 (exchange_records)
     -- 不論 receiver_id 是否為 NULL，只要 sender_id 符合且舊名稱匹配就更新
-    -- 這確保了手動輸入或關聯的好友名稱都能保持一致
+    -- 這確保了手動輸入或關聯的皮友名稱都能保持一致
     UPDATE public.exchange_records
     SET receiver_name = NEW.friend_name
     WHERE sender_id = NEW.user_id AND receiver_name = OLD.friend_name;

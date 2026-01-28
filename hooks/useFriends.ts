@@ -1,5 +1,5 @@
-// 好友資料 Hook
-// 提供好友列表的讀取與操作
+// 皮友資料 Hook
+// 提供皮友列表的讀取與操作
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
@@ -25,7 +25,7 @@ const mapRowToFriend = (row: any): Friend => {
     return {
         id: row.id,
         name: row.friend_name || '未命名皮友',
-        lastActive: '好友', // 統一顯示為好友
+        lastActive: '皮友', // 統一顯示為皮友
         avatar: row.friend_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(row.friend_name || 'P')}&background=random&color=fff`,
         recentSent: [],
         isFavorite: row.is_favorite || false,
@@ -36,11 +36,11 @@ export const useFriends = () => {
     const { user } = useAuth();                            // 取得當前使用者
     const { fetchPostcards } = usePostcards();             // 取得明信片刷新函式
     const { fetchRecords } = useExchangeRecords();         // 取得紀錄刷新函式
-    const [friends, setFriends] = useState<Friend[]>([]);  // 好友列表
+    const [friends, setFriends] = useState<Friend[]>([]);  // 皮友列表
     const [loading, setLoading] = useState(true);          // 載入中狀態
     const [error, setError] = useState<string | null>(null); // 錯誤訊息
 
-    // 取得好友列表
+    // 取得皮友列表
     const fetchFriends = useCallback(async () => {
         if (!user) {
             setFriends([]);
@@ -52,7 +52,7 @@ export const useFriends = () => {
             setLoading(true);
             setError(null);
 
-            // 查詢好友關係，並關聯好友的 profile
+            // 查詢皮友關係，並關聯皮友的 profile
             const { data, error: fetchError } = await supabase
                 .from('friends')
                 .select(`
@@ -70,12 +70,12 @@ export const useFriends = () => {
 
             if (fetchError) throw fetchError;
 
-            // 取得每位好友最近收到的明信片
+            // 取得每位皮友最近收到的明信片
             const friendsWithRecent = await Promise.all(
                 (data || []).map(async (row: any) => {
                     const friend = mapRowToFriend(row);
 
-                    // 查詢最近寄給這位好友的明信片
+                    // 查詢最近寄給這位皮友的明信片
                     const { data: recentData } = await supabase
                         .from('exchange_records')
                         .select(`
@@ -99,13 +99,13 @@ export const useFriends = () => {
             setFriends(friendsWithRecent);
         } catch (err: any) {
             setError(err.message);
-            console.error('取得好友列表失敗:', err);
+            console.error('取得皮友列表失敗:', err);
         } finally {
             setLoading(false);
         }
     }, [user]);
 
-    // 切換好友收藏狀態
+    // 切換皮友收藏狀態
     const toggleFavoriteFriend = async (friendId: string) => {
         if (!user) return;
 
@@ -135,16 +135,16 @@ export const useFriends = () => {
                     f.id === friendId ? { ...f, isFavorite: friend.isFavorite } : f
                 )
             );
-            console.error('更新好友收藏狀態失敗:', err);
+            console.error('更新皮友收藏狀態失敗:', err);
         }
     };
 
-    // 手動建立好友（皮友）
+    // 手動建立皮友（皮友）
     const createFriend = async (name: string) => {
         if (!user) return { error: '請先登入' };
 
         try {
-            // 直接在 friends 表插入手動好友資料，不需關聯到 profiles (friend_id 可為 null)
+            // 直接在 friends 表插入手動皮友資料，不需關聯到 profiles (friend_id 可為 null)
             const { error: friendError } = await supabase
                 .from('friends')
                 .insert({
@@ -158,12 +158,12 @@ export const useFriends = () => {
             await fetchFriends();
             return { error: null };
         } catch (err: any) {
-            console.error('建立好友失敗:', err);
+            console.error('建立皮友失敗:', err);
             return { error: err.message };
         }
     };
 
-    // 刪除好友
+    // 刪除皮友
     const deleteFriend = async (friendId: string) => {
         if (!user) return { error: '請先登入' };
 
@@ -179,12 +179,12 @@ export const useFriends = () => {
             await fetchFriends();
             return { error: null };
         } catch (err: any) {
-            console.error('刪除好友失敗:', err);
+            console.error('刪除皮友失敗:', err);
             return { error: err.message };
         }
     };
 
-    // 更新好友名稱
+    // 更新皮友名稱
     const updateFriendName = async (friendId: string, newName: string) => {
         if (!user) return { error: '請先登入' };
         if (!newName.trim()) return { error: '名稱不能為空' };
@@ -213,12 +213,12 @@ export const useFriends = () => {
         } catch (err: any) {
             // 回滾更新：重新取得資料
             await fetchFriends();
-            console.error('更新好友名稱失敗:', err);
+            console.error('更新皮友名稱失敗:', err);
             return { error: err.message };
         }
     };
 
-    // 更新好友頭像
+    // 更新皮友頭像
     const updateFriendAvatar = async (friendId: string, file: File) => {
         if (!user) return { error: '請先登入' }; // 檢查登入狀態
 
@@ -268,7 +268,7 @@ export const useFriends = () => {
         } catch (err: any) {
             // 回滾更新：重新取得資料
             await fetchFriends();
-            console.error('更新好友頭像失敗:', err);
+            console.error('更新皮友頭像失敗:', err);
             return { error: err.message }; // 回傳錯誤訊息
         }
     };
@@ -278,9 +278,9 @@ export const useFriends = () => {
         if (!user) return { error: '請先登入' }; // 檢查登入狀態
 
         try {
-            // 取得目前好友的資料，用於生成預設頭像（如果需要的話）
+            // 取得目前皮友的資料，用於生成預設頭像（如果需要的話）
             const friend = friends.find(f => f.id === friendId);
-            if (!friend) throw new Error('找不到該好友');
+            if (!friend) throw new Error('找不到該皮友');
 
             // 產預設頭像 URL (ui-avatars)
             const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.name)}&background=7dd3fc&color=fff&bold=true`;

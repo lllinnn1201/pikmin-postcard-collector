@@ -106,7 +106,7 @@ const MapView: React.FC<MapViewProps> = ({ onBack, onSelectPostcard }) => {
             <div className="flex gap-3">
               <button onClick={() => onSelectPostcard(mainPostcard)} className="flex-1 h-12 bg-primary hover:bg-[#25d360] active:scale-95 transition-all rounded-xl flex items-center justify-center gap-2 text-slate-900 font-bold shadow-sm">
                 <span className="material-symbols-outlined text-[20px]">send</span>
-                <span>寄送給好友</span>
+                <span>寄送給皮友</span>
               </button>
               <button className="w-12 h-12 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-slate-800 text-slate-700 dark:text-white">
                 <span className="material-symbols-outlined text-[22px]">favorite_border</span>

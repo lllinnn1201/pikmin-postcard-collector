@@ -14,7 +14,7 @@ ALTER TABLE exchange_records ENABLE ROW LEVEL SECURITY;
 -- profiles 表政策
 -- =====================================================
 
--- 使用者可以讀取所有 profile（用於顯示好友資訊）
+-- 使用者可以讀取所有 profile（用於顯示皮友資訊）
 CREATE POLICY "所有人可讀取 profiles"
   ON profiles FOR SELECT
   USING (true);
@@ -64,25 +64,25 @@ CREATE POLICY "使用者可更新自己的 user_postcards"
   USING (auth.uid() = user_id);
 
 -- =====================================================
--- friends 表政策
+-- friends 表政策 (皮友)
 -- =====================================================
 
--- 使用者可讀取與自己相關的好友關係
+-- 使用者可讀取與自己相關的皮友關係
 CREATE POLICY "使用者可讀取自己的 friends"
   ON friends FOR SELECT
   USING (auth.uid() = user_id OR auth.uid() = friend_id);
 
--- 使用者可新增好友
+-- 使用者可新增皮友
 CREATE POLICY "使用者可新增 friends"
   ON friends FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- 使用者可更新自己的好友設定
+-- 使用者可更新自己的皮友設定
 CREATE POLICY "使用者可更新自己的 friends"
   ON friends FOR UPDATE
   USING (auth.uid() = user_id);
 
--- 使用者可刪除自己的好友
+-- 使用者可刪除自己的皮友
 CREATE POLICY "使用者可刪除自己的 friends"
   ON friends FOR DELETE
   USING (auth.uid() = user_id);

@@ -49,7 +49,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
       } else {
         // 登入/註冊成功
         if (isSignUp) {
-          setError('註冊成功！現在您可以使用此帳號登入了。');
+          setError('註冊成功！現在你可以使用此帳號登入了。'); // 修改「您」為「你」
           setIsSignUp(false); // 註冊成功後切換至登入模式
         } else {
           onLogin();  // 觸發登入成功回調
@@ -115,7 +115,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="flex-1 py-3 bg-transparent border-none focus:ring-0 text-text-main-light dark:text-white placeholder:text-slate-400"
-                placeholder="輸入您的帳號名稱"
+                placeholder="輸入你的帳號名稱" // 修改「您」為「你」
                 required
                 disabled={isLoading}
               />
@@ -132,7 +132,7 @@ const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="flex-1 py-3 bg-transparent border-none focus:ring-0 text-text-main-light dark:text-white placeholder:text-slate-400"
-                placeholder={isSignUp ? '設定您的密碼（至少6字元）' : '輸入您的密碼'}
+                placeholder={isSignUp ? '設定你的密碼（至少6字元）' : '輸入你的密碼'} // 修改「您」為「你」
                 required
                 minLength={6}
                 disabled={isLoading}

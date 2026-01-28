@@ -164,7 +164,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({ onBack, onLogout }) => {
         <div className="space-y-3">
           {[
             { title: '環球旅行者', desc: '收集來自 5 個國家的明信片', icon: 'public', progress: 80 },
-            { title: '皮克敏之友', desc: '與 10 位好友交換明信片', icon: 'favorite', progress: 100 },
+            { title: '皮克敏之友', desc: '與 10 位皮友交換明信片', icon: 'favorite', progress: 100 },
             { title: '早鳥', desc: '在清晨收集 10 張明信片', icon: 'light_mode', progress: 45 }
           ].map((a, i) => (
             <div key={i} className="bg-white dark:bg-surface-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">

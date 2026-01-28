@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { ExchangeRecord } from '../types';
 
-// 按好友分組的紀錄介面（與 RecordsView 相容）
+// 按皮友分組的紀錄介面（與 RecordsView 相容）
 export interface GroupedRecord {
     friendId: string;
     friendName: string;
@@ -17,7 +17,7 @@ export interface GroupedRecord {
         imageUrl: string;
         date: string;
     }[];
-    isFavorite?: boolean; // 好友收藏狀態（可選）
+    isFavorite?: boolean; // 皮友收藏狀態（可選）
 }
 
 // 從資料庫行轉換為前端 ExchangeRecord 型別
@@ -114,7 +114,7 @@ export const useExchangeRecords = () => {
             // 轉換手動標註紀錄為 ExchangeRecord 格式
             const manualRecords: ExchangeRecord[] = (manualData || []).map((row: any) => ({
                 id: row.id,
-                friendId: row.sent_to, // 使用名稱作為虛擬 ID，與朋友列表同步
+                friendId: row.sent_to, // 使用名稱作為虛擬 ID，與皮友列表同步
                 friendName: row.sent_to,
                 friendAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(row.sent_to)}&background=7dd3fc&color=fff&bold=true`, // 使用簡潔的縮寫頭像
                 date: new Date(row.collected_date).toLocaleDateString('zh-TW', {
@@ -140,7 +140,7 @@ export const useExchangeRecords = () => {
         }
     }, [user]);
 
-    // 按好友分組的紀錄（僅顯示寄出的）
+    // 按皮友分組的紀錄（僅顯示寄出的）
     const groupedRecords = useMemo((): GroupedRecord[] => {
         const groups: Record<string, GroupedRecord> = {};
 

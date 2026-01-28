@@ -25,7 +25,7 @@ const UploadView: React.FC = () => {
         description: '',
         color: '#ed6c00',
         collectedDate: new Date().toISOString().split('T')[0],
-        sentTo: '', // 新增：寄送給哪位好友
+        sentTo: '', // 新增：寄送給哪位皮友
     });
 
     // 處理檔案選擇
@@ -67,7 +67,7 @@ const UploadView: React.FC = () => {
             if (formData.sentTo.trim()) {
                 const matchedFriend = friends.find(f => f.name.toLowerCase() === formData.sentTo.trim().toLowerCase());
                 if (!matchedFriend) {
-                    throw new Error('此好友尚未新增，請先至「好友」頁面新增好友後再寄送。');
+                    throw new Error('此皮友尚未新增，請先至「皮友」頁面新增皮友後再寄送。');
                 }
             }
 
@@ -228,9 +228,8 @@ const UploadView: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* 寄送好友 */}
                         <div className="relative">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">寄送好友 (選填)</label>
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 block px-1">寄送皮友 (選填)</label>
                             <input
                                 name="sentTo"
                                 value={formData.sentTo}

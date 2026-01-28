@@ -25,14 +25,14 @@ pikmin-postcard-collector/
 │   └── AuthContext.tsx       # 認證狀態管理 Context
 ├── hooks/
 │   ├── usePostcards.ts       # 明信片 CRUD Hook
-│   ├── useFriends.ts         # 好友 CRUD Hook
+│   ├── useFriends.ts         # 皮友 CRUD Hook
 │   ├── useExchangeRecords.ts # 交換紀錄 Hook
 │   └── useProfile.ts         # 個人檔案 Hook
 ├── views/
 │   ├── LoginView.tsx         # 登入頁面
 │   ├── CollectionView.tsx    # 收藏館頁面
 │   ├── DetailView.tsx        # 明信片詳情頁面
-│   ├── SelectFriendView.tsx  # 選擇好友頁面
+│   ├── SelectFriendView.tsx  # 選擇皮友頁面
 │   ├── RecordsView.tsx       # 寄送紀錄頁面
 │   └── ProfileView.tsx       # 個人檔案頁面
 ├── components/
@@ -55,7 +55,7 @@ npm install
 
 1. 前往 [Supabase](https://supabase.com) 建立專案
 2. 複製 `.env.example` 為 `.env.local`
-3. 填入您的 Supabase 設定：
+3. 填入你的 Supabase 設定：
 
 ```env
 VITE_SUPABASE_URL=https://your-project-id.supabase.co
@@ -81,7 +81,7 @@ npm run dev
 ### Postcard（明信片）
 - id, title, location, country, imageUrl, date, description, color, isSpecial, isFavorite
 
-### Friend（好友）
+### Friend（皮友）
 - id, name, lastActive, avatar, recentSent, isFavorite
 
 ### ExchangeRecord（交換紀錄）
@@ -92,7 +92,7 @@ npm run dev
 - ✅ 使用者認證（登入/註冊/登出）
 - ✅ 明信片收藏瀏覽
 - ✅ 明信片收藏功能
-- ✅ 好友列表管理
+- ✅ 皮友列表管理
 - ✅ 明信片寄送紀錄
 - ✅ 個人檔案頁面
 - ✅ 響應式設計

@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS public.user_postcards (
   UNIQUE(user_id, postcard_id)
 );
 
--- 4. 建立/更新好友表 (Friends)
+-- 4. 建立/更新皮友表 (Friends)
 CREATE TABLE IF NOT EXISTS public.friends (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
@@ -126,11 +126,11 @@ DROP POLICY IF EXISTS "使用者可操作自己的 exchange_records" ON public.e
 CREATE POLICY "使用者可操作自己的 exchange_records" ON public.exchange_records FOR ALL USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
 
 -- 10. 設定儲存空間安全政策 (Storage Policies)
--- 好友頭像 (friend-avatars)
-DROP POLICY IF EXISTS "所有人可讀取好友頭像" ON storage.objects;
-CREATE POLICY "所有人可讀取好友頭像" ON storage.objects FOR SELECT USING (bucket_id = 'friend-avatars');
-DROP POLICY IF EXISTS "使用者可管理自己的好友頭像" ON storage.objects;
-CREATE POLICY "使用者可管理自己的好友頭像" ON storage.objects FOR ALL USING (bucket_id = 'friend-avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
+-- 皮友頭像 (friend-avatars)
+DROP POLICY IF EXISTS "所有人可讀取皮友頭像" ON storage.objects;
+CREATE POLICY "所有人可讀取皮友頭像" ON storage.objects FOR SELECT USING (bucket_id = 'friend-avatars');
+DROP POLICY IF EXISTS "使用者可管理自己的皮友頭像" ON storage.objects;
+CREATE POLICY "使用者可管理自己的皮友頭像" ON storage.objects FOR ALL USING (bucket_id = 'friend-avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
 -- 明信片圖片 (postcards)
 DROP POLICY IF EXISTS "所有人可讀取明信片圖片" ON storage.objects;
 CREATE POLICY "所有人可讀取明信片圖片" ON storage.objects FOR SELECT USING (bucket_id = 'postcards');
@@ -163,7 +163,7 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- 12. 好友資訊同步觸發器 (同步更新 user_postcards 與 exchange_records)
+-- 12. 皮友資訊同步觸發器 (同步更新 user_postcards 與 exchange_records)
 CREATE OR REPLACE FUNCTION public.sync_friend_info_update()
 RETURNS TRIGGER AS $$
 BEGIN

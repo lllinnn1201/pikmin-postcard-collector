@@ -25,7 +25,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
 
   const [recipientName, setRecipientName] = useState('');          // 收件人姓名輸入
   const [isSaving, setIsSaving] = useState(false);                  // 儲存中狀態
-  const [showSuggestions, setShowSuggestions] = useState(false);    // 顯示好友建議選單
+  const [showSuggestions, setShowSuggestions] = useState(false);    // 顯示皮友建議選單
   const [validationError, setValidationError] = useState('');       // 驗證錯誤訊息
 
   // 計算重複名稱列表（用於分配不同顏色）
@@ -102,9 +102,9 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
     const matchedFriend = friends.find(
       (f) => f.name.toLowerCase() === recipientName.trim().toLowerCase()
     );
-    // 若不在好友列表中，顯示錯誤訊息並阻止儲存
+    // 若不在皮友列表中，顯示錯誤訊息並阻止儲存
     if (!matchedFriend) {
-      setValidationError('此好友尚未新增，請先至「好友」頁面新增好友後再寄送。');
+      setValidationError('此皮友尚未新增，請先至「皮友」頁面新增皮友後再寄送。');
       return;
     }
     // 開始儲存流程
@@ -323,7 +323,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                       })()}
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-text-main-light dark:text-white">{displayPostcard.sentTo}</span>
-                        <span className="text-[10px] text-gray-400">已成功寄送給此好友</span>
+                        <span className="text-[10px] text-gray-400">已成功寄送給此皮友</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -359,7 +359,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                         <p className="text-xs font-medium">{validationError}</p>
                       </div>
                     )}
-                    <p className="text-[11px] text-gray-500 font-medium">尚未有寄送紀錄，您可以手動標註收件人：</p>
+                    <p className="text-[11px] text-gray-500 font-medium">尚未有寄送紀錄，你可以手動標註收件人：</p> // 修改「您」為「你」
                     <div className="flex gap-2">
                       <div className="flex-1 relative">
                         <input
@@ -403,7 +403,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
                                 )}
                                 <div className="flex flex-col">
                                   <span className="text-sm font-bold text-text-main-light dark:text-white truncate">{friend.name}</span>
-                                  {friend.isFavorite && <span className="text-[9px] text-primary font-bold uppercase">最愛好友</span>}
+                                  {friend.isFavorite && <span className="text-[9px] text-primary font-bold uppercase">最愛皮友</span>}
                                 </div>
                               </button>
                             ))}
@@ -445,7 +445,7 @@ const DetailView: React.FC<DetailViewProps> = ({ postcard, onBack, onSend }) => 
           className="w-full relative overflow-hidden group flex items-center justify-center gap-3 bg-primary hover:bg-[#25d660] active:scale-[0.98] transition-all duration-200 text-white h-14 rounded-2xl shadow-lg shadow-primary/30"
         >
           <span className="material-symbols-outlined relative z-10">send</span>
-          <span className="text-lg font-bold tracking-wide relative z-10">寄送給好友</span>
+          <span className="text-lg font-bold tracking-wide relative z-10">寄送給皮友</span>
         </button>
       </div>
     </div>

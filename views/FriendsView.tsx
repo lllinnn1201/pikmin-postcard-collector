@@ -129,7 +129,7 @@ const FriendsView: React.FC = () => {
         <div className="flex flex-col h-full min-h-screen bg-[#f6f7f7] px-4 pt-10 pb-28">
             <header className="mb-6">
                 <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">皮友名單</h1>
-                <p className="text-sm text-slate-400">管理你的好友名單，隨時準備分享驚喜</p>
+                <p className="text-sm text-slate-400">管理你的皮友名單，隨時準備分享驚喜</p>
             </header>
 
             {/* 隱藏的檔案輸入 - 用於頭像上傳 */}
@@ -149,7 +149,7 @@ const FriendsView: React.FC = () => {
                     </div>
                     <input
                         className="w-full h-full bg-transparent border-none pl-12 pr-4 text-base font-bold placeholder-text-sec-light/50 focus:ring-0 focus:outline-none text-slate-700"
-                        placeholder="搜尋好友名稱..."
+                        placeholder="搜尋皮友名稱..."
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -159,7 +159,7 @@ const FriendsView: React.FC = () => {
 
             {/* 新增好友區 */}
             <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 mb-8">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block px-1">新增好友</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 block px-1">新增皮友</label>
                 <form onSubmit={handleAddFriend} className="flex gap-2">
                     <input
                         required
@@ -184,7 +184,7 @@ const FriendsView: React.FC = () => {
                 {error && <p className="mt-2 text-red-500 text-xs font-bold px-1">{error}</p>}
             </div>
 
-            {/* 好友列表區 */}
+            {/* 皮友列表區 */}
             <div className="space-y-4">
                 {/* 分類標籤 */}
                 <div className="flex gap-2 mb-4">
@@ -320,7 +320,7 @@ const FriendsView: React.FC = () => {
                                     <span className="material-symbols-outlined text-slate-200 text-3xl">person</span>
                                 </div>
                                 <p className="text-slate-400 font-bold">還沒有皮友喔！</p>
-                                <p className="text-xs text-slate-300">快在上方輸入名稱來新增好友吧</p>
+                                <p className="text-xs text-slate-300">快在上方輸入名稱來新增皮友吧</p>
                             </div>
                         )}
                     </div>
@@ -343,7 +343,7 @@ const FriendsView: React.FC = () => {
                         </div>
                         {/* 標題 */}
                         <h3 className="text-xl font-black text-slate-800 text-center mb-2">
-                            刪除好友
+                            刪除皮友
                         </h3>
                         {/* 說明文字 */}
                         <p className="text-slate-500 text-center mb-6">

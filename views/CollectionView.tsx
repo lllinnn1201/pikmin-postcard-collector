@@ -120,7 +120,7 @@ const CollectionView: React.FC<CollectionViewProps> = ({
       {/* 頁首區域 */}
       <header className="px-4 pt-10 mb-6">
         <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">我的明信片</h1>
-        <p className="text-sm text-slate-400">瀏覽並管理您收集的所有皮克敏明信片</p>
+        <p className="text-sm text-slate-400">瀏覽並管理你收集的所有皮克敏明信片</p> // 修改「您」為「你」
       </header>
 
       {/* 搜尋欄 */}
