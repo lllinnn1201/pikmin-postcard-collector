@@ -98,20 +98,22 @@ const FriendsView: React.FC = () => {
         setLoading(false);
     };
 
-    // 判斷字元類型：中文、英文、特殊符號
+    // 判斷字元類型：中文/日文漢字、英文、日文假名、韓文諺文、其他
     const getCharType = (char: string): number => {
-        if (/[\u4e00-\u9fff]/.test(char)) return 0; // 中文優先
+        if (/[\u4e00-\u9fff]/.test(char)) return 0; // 中文/日文漢字優先
         if (/[a-zA-Z]/.test(char)) return 1; // 英文次之
-        return 2; // 特殊符號最後
+        if (/[\u3040-\u30ff]/.test(char)) return 2; // 日文假名第三
+        if (/[\uac00-\ud7af\u1100-\u11ff\u3130-\u318f]/.test(char)) return 3; // 韓文諺文第四
+        return 4; // 特殊符號最後
     };
 
-    // 名稱排序比較函式（中文筆畫、英文 A~Z、特殊符號）
+    // 名稱排序比較函式（按類型、語系習慣排序）
     const compareName = (a: string, b: string): number => {
         const typeA = getCharType(a.charAt(0));
         const typeB = getCharType(b.charAt(0));
         // 先按類型排序
         if (typeA !== typeB) return typeA - typeB;
-        // 同類型則使用 localeCompare（中文會按筆畫排序）
+        // 同類型則使用 localeCompare（中文會按筆畫排序，日韓按字典序）
         return a.localeCompare(b, 'zh-Hant-TW', { sensitivity: 'base' });
     };
 
