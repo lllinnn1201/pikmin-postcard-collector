@@ -45,13 +45,53 @@ const CollectionView: React.FC<CollectionViewProps> = ({
   };
 
   // 名稱排序比較函式（中文筆畫、英文 A~Z、特殊符號）
+  // 採逐字比對，以確保多字元時仍能正確排序
   const compareName = (a: string, b: string): number => {
-    const typeA = getCharType(a.charAt(0));
-    const typeB = getCharType(b.charAt(0));
-    // 先按類型排序
-    if (typeA !== typeB) return typeA - typeB;
-    // 同類型則使用 localeCompare（中文會按筆畫排序）
-    return a.localeCompare(b, 'zh-Hant-TW', { sensitivity: 'base' });
+    // 【筆畫補強表】解決 localeCompare 始終區分不同字元順序的問題
+    // 將同筆畫的常見開頭字元分組，使其在比較時傳回 0，進而觸發下一位元比對
+    const strokeGroups: Record<string, number> = {
+      '一': 1,
+      '二': 2, '九': 2, '十': 2, '力': 2, '刀': 2, '丁': 2, '七': 2, '八': 2, '人': 2,
+      '三': 3, '上': 3, '下': 3, '大': 3, '小': 3, '口': 3, '土': 3, '山': 3, '才': 3, '子': 3,
+      '四': 5, // 四是 5 畫
+      '五': 4, '六': 4, '中': 4, '天': 4, '公': 4, '文': 4, '化': 4, '王': 4,
+    };
+
+    const minLen = Math.min(a.length, b.length);
+
+    for (let i = 0; i < minLen; i++) {
+      const charA = a.charAt(i);
+      const charB = b.charAt(i);
+
+      if (charA === charB) continue;
+
+      const typeA = getCharType(charA);
+      const typeB = getCharType(charB);
+
+      if (typeA !== typeB) return typeA - typeB;
+
+      // 針對中文進行筆畫歸類比對
+      if (typeA === 0) {
+        const groupA = strokeGroups[charA];
+        const groupB = strokeGroups[charB];
+
+        // 如果兩個字都在自定義分組中且筆畫群組相同，則「視為相等」並繼續比對下一字
+        if (groupA !== undefined && groupB !== undefined && groupA === groupB) {
+          continue;
+        }
+
+        // 否則使用筆畫排序語系 (zh-u-co-stroke)
+        const diff = charA.localeCompare(charB, 'zh-Hant-TW-u-co-stroke', { sensitivity: 'base' });
+        if (diff !== 0) return diff;
+      } else {
+        // 英文或符號，直接比對
+        const diff = charA.localeCompare(charB, 'zh-Hant-TW', { sensitivity: 'base' });
+        if (diff !== 0) return diff;
+      }
+    }
+
+    // 若前面比對皆相同，則較短的優先。若長度也相同，則用標準排序做最後決定
+    return a.length - b.length || a.localeCompare(b, 'zh-Hant-TW');
   };
 
   // 處理收藏切換
